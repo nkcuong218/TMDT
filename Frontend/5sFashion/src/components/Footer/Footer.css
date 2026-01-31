@@ -1,0 +1,129 @@
+.footer {
+    background-color: var(--white);
+    border-top: 1px solid var(--border-color);
+    padding: 60px 0 20px;
+    color: var(--text-main);
+    margin-top: 60px;
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.footer-col h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    color: var(--text-main);
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+.footer-links a:hover {
+    color: var(--primary-color);
+}
+
+.footer-info p {
+    line-height: 1.6;
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 12px;
+}
+
+.social-links {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.social-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    color: var(--text-main);
+    /* Ensure icons inherit color */
+}
+
+.social-btn:hover {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+/* Specific style for Zalo icon to handle filtering */
+.zalo-icon {
+    filter: brightness(0);
+    /* Make black by default */
+    transition: all 0.3s;
+}
+
+.social-btn:hover .zalo-icon {
+    filter: brightness(0) invert(1);
+    /* Invert black to white on hover */
+}
+
+.bct-img {
+    margin-top: 20px;
+    width: 150px;
+}
+
+.newsletter-form {
+    display: flex;
+    margin-top: 16px;
+}
+
+.newsletter-input {
+    flex: 1;
+    padding: 10px 16px;
+    border: 1px solid var(--border-color);
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    outline: none;
+    font-family: var(--font-body);
+}
+
+.newsletter-btn {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0 20px;
+    border-radius: 0 4px 4px 0;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+@media (max-width: 1024px) {
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 600px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+}

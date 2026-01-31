@@ -1,0 +1,21 @@
+.product-section {
+    padding: 60px 0;
+}
+
+.view-all-btn {
+    background-color: whitesmoke;
+    display: block;
+    width: fit-content;
+    margin: 40px auto 0;
+    padding: 12px 32px;
+    border: 0px solid var(--text-main);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s;
+}
+
+.view-all-btn:hover {
+    background-color: red;
+    color: white;
+}

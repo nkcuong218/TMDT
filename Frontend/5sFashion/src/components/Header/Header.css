@@ -1,0 +1,281 @@
+/* Existing styles... */
+.header-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: var(--white);
+    box-shadow: var(--shadow-sm);
+}
+
+.top-bar {
+    background-color: var(--primary-color);
+    color: var(--white);
+    font-size: 12px;
+    padding: 8px 0;
+    text-align: center;
+}
+
+.header-main {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: static;
+    /* Allow mega menu to reference header-wrapper */
+}
+
+/* Update: Header main container needs to be static or we position mega menu relative to viewport/header-wrapper?
+   Usually Mega Menu is full width of the wrapper. 
+   Let's make .header-wrapper position: relative (already sticky, which acts like relative for children).
+   We want the mega menu to be width: 100% of the window or container? 
+   The image suggests it spans the full container width or at least a large width.
+   Let's try to make it span the .container width.
+*/
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 32px;
+    height: 100%;
+    /* Full height to allow hover tracking */
+    align-items: center;
+}
+
+/* Nav Item Wrapper to handle hover */
+.nav-item {
+    position: static;
+    /* Use static so position absolute children relate to header-main */
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: var(--text-main);
+    position: relative;
+    text-decoration: none;
+    padding: 28px 0;
+    /* Increase hit area */
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    /* Adjust based on padding */
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--primary-color);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Mega Menu Styles */
+.mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border-top: 1px solid #e0e0e0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 30px 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+/* Show Mega Menu on Hover */
+.nav-item:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.mega-menu-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.mega-menu-column {
+    flex: 1;
+}
+
+.mega-menu-column h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: black;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #333;
+    /* Underline style from image */
+    display: inline-block;
+    padding-bottom: 4px;
+}
+
+.mega-menu-column ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mega-menu-column ul li {
+    margin-bottom: 12px;
+}
+
+.mega-menu-column ul li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.mega-menu-column ul li a:hover {
+    color: var(--primary-color);
+}
+
+/* Image Column in Mega Menu */
+.mega-menu-image {
+    flex: 2;
+    /* Wider column for image */
+    display: flex;
+    align-items: flex-start;
+}
+
+.mega-menu-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* Utils */
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background: #f5f5f5;
+    padding: 8px 16px;
+    border-radius: 20px;
+    width: 240px;
+}
+
+.search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    margin-left: 8px;
+    width: 100%;
+    font-size: 14px;
+}
+
+.icon-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.icon-btn:hover {
+    background-color: #f5f5f5;
+}
+
+.cart-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--secondary-color);
+    color: white;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* User Dropdown */
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 200px;
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-top: 10px;
+    z-index: 1001;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-header {
+    padding: 15px;
+    font-size: 14px;
+    color: #333;
+    background: #f9f9f9;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #eee;
+}
+
+.dropdown-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 12px 15px;
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #555;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+    background: #f0f0f0;
+    color: var(--secondary-color);
+}
