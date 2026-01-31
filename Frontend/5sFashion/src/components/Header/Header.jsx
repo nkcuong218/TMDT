@@ -54,27 +54,27 @@ const Header = () => {
 
                     {/* NAM Menu Item with Mega Menu */}
                     <div className="nav-item">
-                        <Link to="/products" className="nav-link">Nam</Link>
+                        <Link to="/category/nam" className="nav-link">Nam</Link>
                         <div className="mega-menu">
                             <div className="container mega-menu-content">
                                 {/* Column 1: Áo Nam */}
                                 <div className="mega-menu-column">
                                     <h3>ÁO NAM</h3>
                                     <ul>
-                                        <li><a href="#">Áo Thun</a></li>
-                                        <li><a href="#">Áo Polo</a></li>
-                                        <li><a href="#">Áo Sơ Mi</a></li>
-                                        <li><a href="#">Áo Ba Lỗ</a></li>
-                                        <li><a href="#">Áo Chống Nắng</a></li>
-                                        <li><a href="#">Áo Thun Dài Tay</a></li>
-                                        <li><a href="#">Áo Polo Dài Tay</a></li>
-                                        <li><a href="#">Áo Nỉ</a></li>
-                                        <li><a href="#">Áo Len</a></li>
-                                        <li><a href="#">Áo Khoác</a></li>
-                                        <li><a href="#">Áo Bomber</a></li>
-                                        <li><a href="#">Áo Khoác Gió</a></li>
-                                        <li><a href="#">Áo Phao</a></li>
-                                        <li><a href="#">Áo Vest - Áo Blazer</a></li>
+                                        <li><Link to="/category/ao-thun-nam">Áo Thun</Link></li>
+                                        <li><Link to="/category/ao-polo-nam">Áo Polo</Link></li>
+                                        <li><Link to="/category/ao-so-mi-nam">Áo Sơ Mi</Link></li>
+                                        <li><Link to="/category/ao-ba-lo-nam">Áo Ba Lỗ</Link></li>
+                                        <li><Link to="/category/ao-chong-nang-nam">Áo Chống Nắng</Link></li>
+                                        <li><Link to="/category/ao-thun-dai-tay-nam">Áo Thun Dài Tay</Link></li>
+                                        <li><Link to="/category/ao-polo-dai-tay-nam">Áo Polo Dài Tay</Link></li>
+                                        <li><Link to="/category/ao-ni-nam">Áo Nỉ</Link></li>
+                                        <li><Link to="/category/ao-len-nam">Áo Len</Link></li>
+                                        <li><Link to="/category/ao-khoac-nam">Áo Khoác</Link></li>
+                                        <li><Link to="/category/ao-bomber-nam">Áo Bomber</Link></li>
+                                        <li><Link to="/category/ao-khoac-gio-nam">Áo Khoác Gió</Link></li>
+                                        <li><Link to="/category/ao-phao-nam">Áo Phao</Link></li>
+                                        <li><Link to="/category/vest-nam">Áo Vest - Áo Blazer</Link></li>
                                     </ul>
                                 </div>
 
@@ -82,15 +82,15 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>QUẦN NAM</h3>
                                     <ul>
-                                        <li><a href="#">Quần Short Nam</a></li>
-                                        <li><a href="#">Quần Short Thể Thao</a></li>
-                                        <li><a href="#">Quần Short Kaki</a></li>
-                                        <li><a href="#">Quần Short Tây</a></li>
-                                        <li><a href="#">Quần Short Casual</a></li>
-                                        <li><a href="#">Quần Dài Thể Thao</a></li>
-                                        <li><a href="#">Quần Dài Kaki</a></li>
-                                        <li><a href="#">Quần Tây</a></li>
-                                        <li><a href="#">Quần Jeans</a></li>
+                                        <li><Link to="/category/quan-short-nam">Quần Short Nam</Link></li>
+                                        <li><Link to="/category/quan-short-the-thao-nam">Quần Short Thể Thao</Link></li>
+                                        <li><Link to="/category/quan-short-kaki-nam">Quần Short Kaki</Link></li>
+                                        <li><Link to="/category/quan-short-tay-nam">Quần Short Tây</Link></li>
+                                        <li><Link to="/category/quan-short-casual-nam">Quần Short Casual</Link></li>
+                                        <li><Link to="/category/quan-dai-the-thao-nam">Quần Dài Thể Thao</Link></li>
+                                        <li><Link to="/category/quan-dai-kaki-nam">Quần Dài Kaki</Link></li>
+                                        <li><Link to="/category/quan-tay-nam">Quần Tây</Link></li>
+                                        <li><Link to="/category/quan-jeans-nam">Quần Jeans</Link></li>
                                     </ul>
                                 </div>
 
@@ -98,10 +98,10 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>PHỤ KIỆN</h3>
                                     <ul>
-                                        <li><a href="#">Quần Lót</a></li>
-                                        <li><a href="#">Quần Lót Boxer</a></li>
-                                        <li><a href="#">Quần Lót Brief</a></li>
-                                        <li><a href="#">Tất Nam</a></li>
+                                        <li><Link to="/category/quan-lot-nam">Quần Lót</Link></li>
+                                        <li><Link to="/category/quan-lot-boxer-nam">Quần Lót Boxer</Link></li>
+                                        <li><Link to="/category/quan-lot-brief-nam">Quần Lót Brief</Link></li>
+                                        <li><Link to="/category/tat-nam">Tất Nam</Link></li>
                                     </ul>
                                 </div>
 
@@ -109,9 +109,9 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>ĐỒ BỘ NAM</h3>
                                     <ul>
-                                        <li><a href="#">Bộ Nỉ</a></li>
-                                        <li><a href="#">Bộ Thể Thao</a></li>
-                                        <li><a href="#">Bộ Vest</a></li>
+                                        <li><Link to="/category/bo-ni-nam">Bộ Nỉ</Link></li>
+                                        <li><Link to="/category/bo-the-thao-nam">Bộ Thể Thao</Link></li>
+                                        <li><Link to="/category/bo-vest-nam">Bộ Vest</Link></li>
                                     </ul>
                                 </div>
 
@@ -125,22 +125,22 @@ const Header = () => {
 
                     {/* NỮ Menu Item with Mega Menu */}
                     <div className="nav-item">
-                        <a href="#" className="nav-link">Nữ</a>
+                        <Link to="/category/nu" className="nav-link">Nữ</Link>
                         <div className="mega-menu">
                             <div className="container mega-menu-content">
                                 {/* Column 1: Áo Nữ */}
                                 <div className="mega-menu-column">
                                     <h3>ÁO NỮ</h3>
                                     <ul>
-                                        <li><a href="#">Áo Thun</a></li>
-                                        <li><a href="#">Áo Sơ Mi</a></li>
-                                        <li><a href="#">Áo Len</a></li>
-                                        <li><a href="#">Áo Nỉ</a></li>
-                                        <li><a href="#">Áo Giữ Nhiệt</a></li>
-                                        <li><a href="#">Áo Phao</a></li>
-                                        <li><a href="#">Áo Gió</a></li>
-                                        <li><a href="#">Áo Khoác Thời Trang</a></li>
-                                        <li><a href="#">Áo Bomber</a></li>
+                                        <li><Link to="/category/ao-thun-nu">Áo Thun</Link></li>
+                                        <li><Link to="/category/ao-so-mi-nu">Áo Sơ Mi</Link></li>
+                                        <li><Link to="/category/ao-len-nu">Áo Len</Link></li>
+                                        <li><Link to="/category/ao-ni-nu">Áo Nỉ</Link></li>
+                                        <li><Link to="/category/ao-giu-nhiet-nu">Áo Giữ Nhiệt</Link></li>
+                                        <li><Link to="/category/ao-phao-nu">Áo Phao</Link></li>
+                                        <li><Link to="/category/ao-gio-nu">Áo Gió</Link></li>
+                                        <li><Link to="/category/ao-khoac-nu">Áo Khoác Thời Trang</Link></li>
+                                        <li><Link to="/category/ao-bomber-nu">Áo Bomber</Link></li>
                                     </ul>
                                 </div>
 
@@ -148,9 +148,9 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>QUẦN NỮ</h3>
                                     <ul>
-                                        <li><a href="#">Quần Âu</a></li>
-                                        <li><a href="#">Quần Jeans</a></li>
-                                        <li><a href="#">Quần Khác</a></li>
+                                        <li><Link to="/category/quan-au-nu">Quần Âu</Link></li>
+                                        <li><Link to="/category/quan-jeans-nu">Quần Jeans</Link></li>
+                                        <li><Link to="/category/quan-khac-nu">Quần Khác</Link></li>
                                     </ul>
                                 </div>
 
@@ -158,7 +158,7 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>VÁY NỮ</h3>
                                     <ul>
-                                        <li><a href="#">Chân Váy</a></li>
+                                        <li><Link to="/category/chan-vay-nu">Chân Váy</Link></li>
                                     </ul>
                                 </div>
 
@@ -166,7 +166,7 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>PHỤ KIỆN</h3>
                                     <ul>
-                                        <li><a href="#">Tất Chân</a></li>
+                                        <li><Link to="/category/tat-chan-nu">Tất Chân</Link></li>
                                     </ul>
                                 </div>
 
@@ -174,9 +174,9 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>ĐỒ BỘ NỮ</h3>
                                     <ul>
-                                        <li><a href="#">Bộ Đồ Gió</a></li>
-                                        <li><a href="#">Bộ Mặc Nhà</a></li>
-                                        <li><a href="#">Bộ Nỉ</a></li>
+                                        <li><Link to="/category/bo-do-gio-nu">Bộ Đồ Gió</Link></li>
+                                        <li><Link to="/category/bo-mac-nha-nu">Bộ Mặc Nhà</Link></li>
+                                        <li><Link to="/category/bo-ni-nu">Bộ Nỉ</Link></li>
                                     </ul>
                                 </div>
 
@@ -189,22 +189,22 @@ const Header = () => {
                     </div>
                     {/* BÉ TRAI Menu Item with Mega Menu */}
                     <div className="nav-item">
-                        <a href="#" className="nav-link">Bé Trai</a>
+                        <Link to="/category/be-trai" className="nav-link">Bé Trai</Link>
                         <div className="mega-menu">
                             <div className="container mega-menu-content">
                                 {/* Column 1: Áo Bé Trai */}
                                 <div className="mega-menu-column">
                                     <h3>ÁO BÉ TRAI</h3>
                                     <ul>
-                                        <li><a href="#">Áo Thun</a></li>
-                                        <li><a href="#">Áo Sơ Mi</a></li>
-                                        <li><a href="#">Áo Nỉ</a></li>
-                                        <li><a href="#">Áo Giữ Nhiệt</a></li>
-                                        <li><a href="#">Áo Len</a></li>
-                                        <li><a href="#">Áo Bomber</a></li>
-                                        <li><a href="#">Áo Gió</a></li>
-                                        <li><a href="#">Áo Khoác Thời Trang</a></li>
-                                        <li><a href="#">Áo Phao</a></li>
+                                        <li><Link to="/category/ao-thun-be-trai">Áo Thun</Link></li>
+                                        <li><Link to="/category/ao-so-mi-be-trai">Áo Sơ Mi</Link></li>
+                                        <li><Link to="/category/ao-ni-be-trai">Áo Nỉ</Link></li>
+                                        <li><Link to="/category/ao-giu-nhiet-be-trai">Áo Giữ Nhiệt</Link></li>
+                                        <li><Link to="/category/ao-len-be-trai">Áo Len</Link></li>
+                                        <li><Link to="/category/ao-bomber-be-trai">Áo Bomber</Link></li>
+                                        <li><Link to="/category/ao-gio-be-trai">Áo Gió</Link></li>
+                                        <li><Link to="/category/ao-khoac-be-trai">Áo Khoác Thời Trang</Link></li>
+                                        <li><Link to="/category/ao-phao-be-trai">Áo Phao</Link></li>
                                     </ul>
                                 </div>
 
@@ -212,9 +212,9 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>QUẦN BÉ TRAI</h3>
                                     <ul>
-                                        <li><a href="#">Quần Dài Casual</a></li>
-                                        <li><a href="#">Quần Jeans</a></li>
-                                        <li><a href="#">Quần Kaki</a></li>
+                                        <li><Link to="/category/quan-casual-be-trai">Quần Dài Casual</Link></li>
+                                        <li><Link to="/category/quan-jeans-be-trai">Quần Jeans</Link></li>
+                                        <li><Link to="/category/quan-kaki-be-trai">Quần Kaki</Link></li>
                                     </ul>
                                 </div>
 
@@ -222,7 +222,7 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>PHỤ KIỆN BÉ TRAI</h3>
                                     <ul>
-                                        <li><a href="#">Tất Chân</a></li>
+                                        <li><Link to="/category/tat-chan-be-trai">Tất Chân</Link></li>
                                     </ul>
                                 </div>
 
@@ -230,8 +230,8 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>BỘ ĐỒ BÉ TRAI</h3>
                                     <ul>
-                                        <li><a href="#">Bộ Mặc Nhà</a></li>
-                                        <li><a href="#">Bộ Nỉ</a></li>
+                                        <li><Link to="/category/bo-mac-nha-be-trai">Bộ Mặc Nhà</Link></li>
+                                        <li><Link to="/category/bo-ni-be-trai">Bộ Nỉ</Link></li>
                                     </ul>
                                 </div>
 
@@ -244,22 +244,22 @@ const Header = () => {
                     </div>
                     {/* BÉ GÁI Menu Item with Mega Menu */}
                     <div className="nav-item">
-                        <a href="#" className="nav-link">Bé Gái</a>
+                        <Link to="/category/be-gai" className="nav-link">Bé Gái</Link>
                         <div className="mega-menu">
                             <div className="container mega-menu-content">
                                 {/* Column 1: Áo Bé Gái */}
                                 <div className="mega-menu-column">
                                     <h3>ÁO BÉ GÁI</h3>
                                     <ul>
-                                        <li><a href="#">Áo Thun</a></li>
-                                        <li><a href="#">Áo Sơ Mi</a></li>
-                                        <li><a href="#">Áo Nỉ</a></li>
-                                        <li><a href="#">Áo Giữ Nhiệt</a></li>
-                                        <li><a href="#">Áo Len</a></li>
-                                        <li><a href="#">Áo Bomber</a></li>
-                                        <li><a href="#">Áo Gió</a></li>
-                                        <li><a href="#">Áo Khoác Thời Trang</a></li>
-                                        <li><a href="#">Áo Phao</a></li>
+                                        <li><Link to="/category/ao-thun-be-gai">Áo Thun</Link></li>
+                                        <li><Link to="/category/ao-so-mi-be-gai">Áo Sơ Mi</Link></li>
+                                        <li><Link to="/category/ao-ni-be-gai">Áo Nỉ</Link></li>
+                                        <li><Link to="/category/ao-giu-nhiet-be-gai">Áo Giữ Nhiệt</Link></li>
+                                        <li><Link to="/category/ao-len-be-gai">Áo Len</Link></li>
+                                        <li><Link to="/category/ao-bomber-be-gai">Áo Bomber</Link></li>
+                                        <li><Link to="/category/ao-gio-be-gai">Áo Gió</Link></li>
+                                        <li><Link to="/category/ao-khoac-be-gai">Áo Khoác Thời Trang</Link></li>
+                                        <li><Link to="/category/ao-phao-be-gai">Áo Phao</Link></li>
                                     </ul>
                                 </div>
 
@@ -267,10 +267,10 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>QUẦN BÉ GÁI</h3>
                                     <ul>
-                                        <li><a href="#">Quần Dài Casual</a></li>
-                                        <li><a href="#">Quần Jeans</a></li>
-                                        <li><a href="#">Quần Kaki</a></li>
-                                        <li><a href="#">Quần Legging</a></li>
+                                        <li><Link to="/category/quan-casual-be-gai">Quần Dài Casual</Link></li>
+                                        <li><Link to="/category/quan-jeans-be-gai">Quần Jeans</Link></li>
+                                        <li><Link to="/category/quan-kaki-be-gai">Quần Kaki</Link></li>
+                                        <li><Link to="/category/quan-legging-be-gai">Quần Legging</Link></li>
                                     </ul>
                                 </div>
 
@@ -278,8 +278,8 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>VÁY BÉ GÁI</h3>
                                     <ul>
-                                        <li><a href="#">Váy Liền</a></li>
-                                        <li><a href="#">Chân Váy</a></li>
+                                        <li><Link to="/category/vay-lien-be-gai">Váy Liền</Link></li>
+                                        <li><Link to="/category/chan-vay-be-gai">Chân Váy</Link></li>
                                     </ul>
                                 </div>
 
@@ -287,7 +287,7 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>PHỤ KIỆN</h3>
                                     <ul>
-                                        <li><a href="#">Tất Chân</a></li>
+                                        <li><Link to="/category/tat-chan-be-gai">Tất Chân</Link></li>
                                     </ul>
                                 </div>
 
@@ -295,9 +295,9 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>BỘ ĐỒ BÉ GÁI</h3>
                                     <ul>
-                                        <li><a href="#">Bộ Mặc Nhà</a></li>
-                                        <li><a href="#">Bộ Nỉ</a></li>
-                                        <li><a href="#">Bộ Thời Trang</a></li>
+                                        <li><Link to="/category/bo-mac-nha-be-gai">Bộ Mặc Nhà</Link></li>
+                                        <li><Link to="/category/bo-ni-be-gai">Bộ Nỉ</Link></li>
+                                        <li><Link to="/category/bo-thoi-trang-be-gai">Bộ Thời Trang</Link></li>
                                     </ul>
                                 </div>
 
@@ -310,17 +310,17 @@ const Header = () => {
                     </div>
                     {/* BỘ SƯU TẬP Menu Item with Mega Menu */}
                     <div className="nav-item">
-                        <a href="#" className="nav-link">Bộ Sưu Tập</a>
+                        <Link to="/category/bo-suu-tap" className="nav-link">Bộ Sưu Tập</Link>
                         <div className="mega-menu">
                             <div className="container mega-menu-content">
                                 {/* Column 1: Bộ Sưu Tập */}
                                 <div className="mega-menu-column">
                                     <h3>BỘ SƯU TẬP</h3>
                                     <ul>
-                                        <li><a href="#">Bộ Sưu Tập Công Sở</a></li>
-                                        <li><a href="#">Bộ Sưu Tập Thể Thao</a></li>
-                                        <li><a href="#">Bộ Sưu Tập Xuân Hè</a></li>
-                                        <li><a href="#">Bộ Sưu Tập Thu Đông</a></li>
+                                        <li><Link to="/category/bst-cong-so">Bộ Sưu Tập Công Sở</Link></li>
+                                        <li><Link to="/category/bst-the-thao">Bộ Sưu Tập Thể Thao</Link></li>
+                                        <li><Link to="/category/bst-xuan-he">Bộ Sưu Tập Xuân Hè</Link></li>
+                                        <li><Link to="/category/bst-thu-dong">Bộ Sưu Tập Thu Đông</Link></li>
                                     </ul>
                                 </div>
 
@@ -328,7 +328,7 @@ const Header = () => {
                                 <div className="mega-menu-column">
                                     <h3>BST XUÂN HÈ 2025</h3>
                                     <ul>
-                                        <li><a href="#">BST 02/09 - Tự Hào Sắc Áo</a></li>
+                                        <li><Link to="/category/bst-tu-hao-sac-ao">BST 02/09 - Tự Hào Sắc Áo</Link></li>
                                     </ul>
                                 </div>
 
