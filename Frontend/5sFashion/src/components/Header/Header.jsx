@@ -34,6 +34,9 @@ const Header = () => {
                         <span>BST Thu Đông 2025 - Giá Trải Nghiệm -30%</span>
                     </div>
                     <div className="top-bar-right" style={{ display: 'flex', gap: '20px' }}>
+                        {isLoggedIn && localStorage.getItem('user_role') === 'admin' && (
+                            <Link to="/admin" style={{ color: 'white', fontWeight: 'bold' }}>Trang Quản Trị</Link>
+                        )}
                         <span>Hotline: 1800.8118</span>
                         <span>Hệ thống cửa hàng</span>
                     </div>
