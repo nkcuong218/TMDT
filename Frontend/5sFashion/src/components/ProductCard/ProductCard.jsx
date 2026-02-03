@@ -1,19 +1,24 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './ProductCard.css';
 
 const ProductCard = ({ product }) => {
     return (
         <div className="product-card">
-            <div className="product-image">
-                {product.discount > 0 && (
-                    <div className="product-badge">-{product.discount}%</div>
-                )}
-                <img src={product.image} alt={product.title} loading="lazy" />
-            </div>
+            <Link to={`/product/${product.id}`} className="product-image-link">
+                <div className="product-image">
+                    {product.discount > 0 && (
+                        <div className="product-badge">-{product.discount}%</div>
+                    )}
+                    <img src={product.image} alt={product.title} loading="lazy" />
+                </div>
+            </Link>
 
             <div className="product-info">
                 <div className="product-category">{product.category}</div>
-                <h3 className="product-title" title={product.title}>{product.title}</h3>
+                <Link to={`/product/${product.id}`} className="product-title-link">
+                    <h3 className="product-title" title={product.title}>{product.title}</h3>
+                </Link>
 
                 <div className="product-price-wrapper">
                     <span className="current-price">{product.price.toLocaleString('vi-VN')}đ</span>
