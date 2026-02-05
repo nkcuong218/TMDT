@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
 
 const ProductManager = () => {
@@ -16,7 +17,7 @@ const ProductManager = () => {
                     <div style={{ display: 'flex', gap: '10px' }}>
                         <input type="text" placeholder="Tìm kiếm sản phẩm..." className="form-input" style={{ width: 300 }} />
                     </div>
-                    <button className="btn-primary" style={{ height: 42 }}>+ Thêm Sản Phẩm</button>
+                    <Link to="/admin/products/add" className="btn-primary" style={{ height: 42, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 20px', textDecoration: 'none', borderRadius: '4px' }}>+ Thêm Sản Phẩm</Link>
                 </div>
 
                 <table className="admin-table">

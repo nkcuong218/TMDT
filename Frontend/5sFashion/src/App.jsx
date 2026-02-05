@@ -12,10 +12,15 @@ import Cart from './pages/Cart/Cart';
 import Checkout from './pages/Checkout/Checkout';
 import AdminDashboard from './pages/Admin/Dashboard/Dashboard';
 import ProductManager from './pages/Admin/Products/ProductManager';
+import AddProduct from './pages/Admin/Products/AddProduct';
 import OrderManager from './pages/Admin/Orders/OrderManager';
 import OrderDetail from './pages/Admin/Orders/OrderDetail';
 import CustomerManager from './pages/Admin/Customers/CustomerManager';
 import CustomerDetail from './pages/Admin/Customers/CustomerDetail';
+import WarehouseManager from './pages/Admin/Warehouse/WarehouseManager';
+import WarehouseHistory from './pages/Admin/Warehouse/WarehouseHistory';
+import WarehouseInvoice from './pages/Admin/Warehouse/WarehouseInvoice';
+import WarehouseImport from './pages/Admin/Warehouse/WarehouseImport';
 
 function App() {
   // DEV: Force Admin Role for testing
@@ -41,10 +46,15 @@ function App() {
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<ProductManager />} />
+        <Route path="/admin/products/add" element={<AddProduct />} />
         <Route path="/admin/orders" element={<OrderManager />} />
         <Route path="/admin/orders/:id" element={<OrderDetail />} />
         <Route path="/admin/users" element={<CustomerManager />} />
         <Route path="/admin/users/:id" element={<CustomerDetail />} />
+        <Route path="/admin/warehouse" element={<WarehouseManager />} />
+        <Route path="/admin/warehouse/history/:id" element={<WarehouseHistory />} />
+        <Route path="/admin/warehouse/invoice/:id" element={<WarehouseInvoice />} />
+        <Route path="/admin/warehouse/import" element={<WarehouseImport />} />
       </Routes>
     </Router>
   );
