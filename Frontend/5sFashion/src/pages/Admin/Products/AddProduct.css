@@ -59,3 +59,36 @@
     background-color: red;
     color: white;
 }
+
+.add-product-form .tag-input-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.add-product-form .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.add-product-form .tag-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border: 1px solid #ddd;
+    border-radius: 999px;
+    background: #f8f8f8;
+    font-size: 13px;
+}
+
+.add-product-form .tag-item button {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #666;
+    font-size: 14px;
+    line-height: 1;
+    padding: 0;
+}

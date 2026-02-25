@@ -20,11 +20,25 @@ const WarehouseImport = () => {
 
     const [formData, setFormData] = useState({
         supplierId: '',
-        note: '',
+        description: {
+            source: '',
+            quality: '',
+            storageNote: ''
+        },
         items: [
             { id: 1, productId: '', variant: '', quantity: 1, unitPrice: 0 }
         ]
     });
+
+    const handleDescriptionChange = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            description: {
+                ...prev.description,
+                [field]: value
+            }
+        }));
+    };
 
     const handleAddItem = () => {
         setFormData(prev => ({
@@ -54,7 +68,17 @@ const WarehouseImport = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Import Data:', formData);
+
+        const importPayload = {
+            ...formData,
+            note: [
+                formData.description.source && `Nguồn hàng: ${formData.description.source}`,
+                formData.description.quality && `Tình trạng: ${formData.description.quality}`,
+                formData.description.storageNote && `Lưu ý bảo quản: ${formData.description.storageNote}`
+            ].filter(Boolean).join(' | ')
+        };
+
+        console.log('Import Data:', importPayload);
         alert('Đã tạo phiếu nhập kho thành công!');
         navigate('/admin/warehouse');
     };
@@ -65,7 +89,7 @@ const WarehouseImport = () => {
                 <form onSubmit={handleSubmit} style={{ maxWidth: '1000px' }}>
 
                     {/* General Info */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', marginBottom: '20px' }}>
                         <div className="form-group">
                             <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Nhà Cung Cấp</label>
                             <select
@@ -79,15 +103,41 @@ const WarehouseImport = () => {
                                 {suppliers.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                             </select>
                         </div>
+                    </div>
+
+                    <h3 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '15px', borderBottom: '1px solid #eee', paddingBottom: '10px' }}>Mô Tả Phiếu Nhập</h3>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', marginBottom: '30px' }}>
                         <div className="form-group">
-                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Ghi Chú</label>
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Nguồn Hàng</label>
                             <input
                                 type="text"
                                 className="form-input"
                                 style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
-                                placeholder="VD: Nhập hàng đợt 1 tháng 11"
-                                value={formData.note}
-                                onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                                placeholder="VD: Lô hàng từ nhà máy Hà Nội"
+                                value={formData.description.source}
+                                onChange={(e) => handleDescriptionChange('source', e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Tình Trạng Hàng</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                                placeholder="VD: Nguyên đai kiện, đủ tem mác"
+                                value={formData.description.quality}
+                                onChange={(e) => handleDescriptionChange('quality', e.target.value)}
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label style={{ display: 'block', marginBottom: '5px', fontWeight: 600 }}>Lưu Ý Bảo Quản</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                style={{ width: '100%', padding: '10px', borderRadius: '4px', border: '1px solid #ddd' }}
+                                placeholder="VD: Tránh ẩm, xếp kệ cao"
+                                value={formData.description.storageNote}
+                                onChange={(e) => handleDescriptionChange('storageNote', e.target.value)}
                             />
                         </div>
                     </div>

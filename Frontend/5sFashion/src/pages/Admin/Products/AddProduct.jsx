@@ -5,13 +5,22 @@ import './AddProduct.css';
 
 const AddProduct = () => {
     const navigate = useNavigate();
+    const [sizeInput, setSizeInput] = useState('');
+    const [colorInput, setColorInput] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         sku: '',
         category: 'Nam',
         price: '',
         stock: 0,
-        description: '',
+        colors: [],
+        sizes: [],
+        descriptionDetails: {
+            highlights: '',
+            material: '',
+            fit: '',
+            careInstructions: ''
+        },
         image: null
     });
 
@@ -27,9 +36,60 @@ const AddProduct = () => {
         }
     };
 
+    const handleDescriptionDetailChange = (field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            descriptionDetails: {
+                ...prev.descriptionDetails,
+                [field]: value
+            }
+        }));
+    };
+
+    const addTag = (field, value) => {
+        const normalizedValue = value.trim();
+        if (!normalizedValue) return;
+
+        setFormData(prev => {
+            if (prev[field].includes(normalizedValue)) return prev;
+
+            return {
+                ...prev,
+                [field]: [...prev[field], normalizedValue]
+            };
+        });
+    };
+
+    const removeTag = (field, tagToRemove) => {
+        setFormData(prev => ({
+            ...prev,
+            [field]: prev[field].filter(tag => tag !== tagToRemove)
+        }));
+    };
+
+    const handleTagKeyDown = (e, field, inputValue, clearInput) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            addTag(field, inputValue);
+            clearInput('');
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('Submitting Product:', formData);
+        const payload = {
+            ...formData,
+            colorOptions: formData.colors,
+            sizeOptions: formData.sizes,
+            description: [
+                formData.descriptionDetails.highlights && `Điểm nổi bật: ${formData.descriptionDetails.highlights}`,
+                formData.descriptionDetails.material && `Chất liệu: ${formData.descriptionDetails.material}`,
+                formData.descriptionDetails.fit && `Form dáng: ${formData.descriptionDetails.fit}`,
+                formData.descriptionDetails.careInstructions && `Hướng dẫn bảo quản: ${formData.descriptionDetails.careInstructions}`
+            ].filter(Boolean).join('\n')
+        };
+
+        console.log('Submitting Product:', payload);
         // Here you would call an API
         alert('Đã thêm sản phẩm thành công! (Mô phỏng)');
         navigate('/admin/products');
@@ -96,6 +156,59 @@ const AddProduct = () => {
                                 placeholder="0"
                             />
                         </div>
+                        <div className="form-group">
+                            <label className="form-label">Kích Cỡ</label>
+                            <div className="tag-input-wrapper">
+                                <div className="tag-list">
+                                    {formData.sizes.map(size => (
+                                        <span key={size} className="tag-item">
+                                            {size}
+                                            <button type="button" onClick={() => removeTag('sizes', size)}>&times;</button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <input
+                                    type="text"
+                                    value={sizeInput}
+                                    onChange={(e) => setSizeInput(e.target.value)}
+                                    onKeyDown={(e) => handleTagKeyDown(e, 'sizes', sizeInput, setSizeInput)}
+                                    onBlur={() => {
+                                        addTag('sizes', sizeInput);
+                                        setSizeInput('');
+                                    }}
+                                    className="form-input form-control"
+                                    placeholder="Nhập size rồi nhấn Enter (VD: S, M, L)"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label className="form-label">Màu Sắc</label>
+                            <div className="tag-input-wrapper">
+                                <div className="tag-list">
+                                    {formData.colors.map(color => (
+                                        <span key={color} className="tag-item">
+                                            {color}
+                                            <button type="button" onClick={() => removeTag('colors', color)}>&times;</button>
+                                        </span>
+                                    ))}
+                                </div>
+                                <input
+                                    type="text"
+                                    value={colorInput}
+                                    onChange={(e) => setColorInput(e.target.value)}
+                                    onKeyDown={(e) => handleTagKeyDown(e, 'colors', colorInput, setColorInput)}
+                                    onBlur={() => {
+                                        addTag('colors', colorInput);
+                                        setColorInput('');
+                                    }}
+                                    className="form-input form-control"
+                                    placeholder="Nhập màu rồi nhấn Enter (VD: Đen, Trắng)"
+                                />
+                            </div>
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -115,13 +228,51 @@ const AddProduct = () => {
 
                     <div className="form-group" style={{ marginBottom: '20px' }}>
                         <label className="form-label">Mô Tả Chi Tiết</label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            rows="5"
-                            className="form-control"
-                        ></textarea>
+                        <div className="form-grid">
+                            <div className="form-group">
+                                <label className="form-label">Điểm Nổi Bật</label>
+                                <textarea
+                                    value={formData.descriptionDetails.highlights}
+                                    onChange={(e) => handleDescriptionDetailChange('highlights', e.target.value)}
+                                    rows="3"
+                                    className="form-control"
+                                    placeholder="VD: Chống nhăn, thoáng khí, dễ phối đồ"
+                                ></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Chất Liệu</label>
+                                <textarea
+                                    value={formData.descriptionDetails.material}
+                                    onChange={(e) => handleDescriptionDetailChange('material', e.target.value)}
+                                    rows="3"
+                                    className="form-control"
+                                    placeholder="VD: 95% Cotton, 5% Spandex"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div className="form-grid">
+                            <div className="form-group">
+                                <label className="form-label">Form Dáng</label>
+                                <textarea
+                                    value={formData.descriptionDetails.fit}
+                                    onChange={(e) => handleDescriptionDetailChange('fit', e.target.value)}
+                                    rows="3"
+                                    className="form-control"
+                                    placeholder="VD: Regular fit, tôn dáng vai"
+                                ></textarea>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Hướng Dẫn Bảo Quản</label>
+                                <textarea
+                                    value={formData.descriptionDetails.careInstructions}
+                                    onChange={(e) => handleDescriptionDetailChange('careInstructions', e.target.value)}
+                                    rows="3"
+                                    className="form-control"
+                                    placeholder="VD: Giặt máy chế độ nhẹ, không sấy nhiệt cao"
+                                ></textarea>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="form-actions">
