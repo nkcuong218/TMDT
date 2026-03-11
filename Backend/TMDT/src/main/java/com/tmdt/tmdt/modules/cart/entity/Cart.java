@@ -27,6 +27,7 @@ public class Cart {
     // Trạng thái giỏ
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private CartStatus status = CartStatus.ACTIVE;
 
     // Quan hệ

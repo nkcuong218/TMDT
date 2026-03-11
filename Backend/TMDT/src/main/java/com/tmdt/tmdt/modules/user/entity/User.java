@@ -1,20 +1,26 @@
 package com.tmdt.tmdt.modules.user.entity;
 
-
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Table(name = "users",
+        indexes = {
+                @Index(name = "idx_users_email", columnList = "email"),
+                @Index(name = "idx_users_phone", columnList = "phone"),
+                @Index(name = "idx_users_status", columnList = "status"),
+                @Index(name = "idx_users_role", columnList = "role")
+        })
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor
 @Builder
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true, length = 100)
@@ -34,30 +40,21 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private AccountStatus status;
+    @Builder.Default
+    private AccountStatus status = AccountStatus.PENDING_VERIFY;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole role;
+    @Builder.Default
+    private UserRole role = UserRole.CUSTOMER;
 
+    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     private LocalDateTime lastLoginAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-        this.status = AccountStatus.PENDING_VERIFY; // mặc định
-        this.role = UserRole.CUSTOMER; // mặc định
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

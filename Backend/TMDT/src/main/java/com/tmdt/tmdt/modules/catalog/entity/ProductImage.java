@@ -26,9 +26,11 @@ public class ProductImage {
 
     // Ảnh đại diện
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isPrimary = false;
 
     // Thứ tự hiển thị
+    @Builder.Default
     private Integer sortOrder = 0;
 
     // SEO / accessibility

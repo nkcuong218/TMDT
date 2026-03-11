@@ -1,27 +1,49 @@
 import React, { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { getAdminCustomers, toggleAdminCustomerStatus } from '../../../services/catalogApi';
 
 const CustomerManager = () => {
     const navigate = useNavigate();
 
-    // Mock Customers State
-    const [customers, setCustomers] = useState([
-        { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@gmail.com', phone: '0901234567', totalOrders: 5, totalSpent: 2500000, status: 'Active' },
-        { id: 2, name: 'Trần Thị B', email: 'tranthib@gmail.com', phone: '0987654321', totalOrders: 12, totalSpent: 15200000, status: 'Active' },
-        { id: 3, name: 'Lê Văn C', email: 'levanc@gmail.com', phone: '0912345678', totalOrders: 1, totalSpent: 299000, status: 'Blocked' },
-        { id: 4, name: 'Phạm Thị D', email: 'phamthid@gmail.com', phone: '0998877665', totalOrders: 3, totalSpent: 1200000, status: 'Active' },
-    ]);
+    const [customers, setCustomers] = useState([]);
+    const [keyword, setKeyword] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const handleToggleStatus = (id) => {
+    useEffect(() => {
+        const loadCustomers = async () => {
+            setLoading(true);
+            setError('');
+            try {
+                const data = await getAdminCustomers({ keyword });
+                setCustomers(Array.isArray(data) ? data : []);
+            } catch (err) {
+                setError(err.message || 'Khong the tai danh sach khach hang');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        const timer = setTimeout(loadCustomers, 250);
+        return () => clearTimeout(timer);
+    }, [keyword]);
+
+    const handleToggleStatus = async (id) => {
         const customer = customers.find(c => c.id === id);
         const newStatus = customer.status === 'Active' ? 'Blocked' : 'Active';
-        const action = newStatus === 'Blocked' ? 'Khóa' : 'Mở khóa';
+        const action = newStatus === 'Blocked' ? 'Khoa' : 'Mo khoa';
 
-        if (window.confirm(`Bạn có chắc muốn ${action} khách hàng ${customer.name}?`)) {
-            setCustomers(customers.map(c =>
-                c.id === id ? { ...c, status: newStatus } : c
-            ));
+        if (window.confirm(`Ban co chac muon ${action} khach hang ${customer.name}?`)) {
+            try {
+                const updated = await toggleAdminCustomerStatus(id);
+                setCustomers(customers.map(c =>
+                    c.id === id ? { ...c, status: updated.status } : c
+                ));
+            } catch (err) {
+                window.alert(err.message || 'Cap nhat trang thai that bai');
+            }
         }
     };
 
@@ -30,9 +52,19 @@ const CustomerManager = () => {
             <div className="admin-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
                     <div style={{ display: 'flex', gap: '10px' }}>
-                        <input type="text" placeholder="Tìm kiếm khách hàng..." className="form-input" style={{ width: 300 }} />
+                        <input
+                            type="text"
+                            placeholder="Tim kiem khach hang..."
+                            className="form-input"
+                            style={{ width: 300 }}
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                        />
                     </div>
                 </div>
+
+                {error ? <div style={{ color: '#dc2626', marginBottom: '12px' }}>{error}</div> : null}
+                {loading ? <div>Dang tai du lieu...</div> : null}
 
                 <table className="admin-table">
                     <thead>
@@ -77,9 +109,9 @@ const CustomerManager = () => {
                                         Xem
                                     </button>
                                     {c.status === 'Active' ? (
-                                        <button className="action-btn" style={{ color: 'red' }} onClick={() => handleToggleStatus(c.id)}>Khóa</button>
+                                        <button className="action-btn" style={{ color: 'red' }} onClick={() => handleToggleStatus(c.id)}>Khoa</button>
                                     ) : (
-                                        <button className="action-btn" style={{ color: 'green' }} onClick={() => handleToggleStatus(c.id)}>Mở</button>
+                                        <button className="action-btn" style={{ color: 'green' }} onClick={() => handleToggleStatus(c.id)}>Mo</button>
                                     )}
                                 </td>
                             </tr>

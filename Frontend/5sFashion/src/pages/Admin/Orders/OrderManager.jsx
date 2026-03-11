@@ -1,19 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { getAdminOrders } from '../../../services/catalogApi';
 
 const OrderManager = () => {
     const navigate = useNavigate();
     const [filterStatus, setFilterStatus] = useState('All');
+    const [orders, setOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    // Mock Orders
-    const [orders, setOrders] = useState([
-        { id: '#ORD-001', customer: 'Nguyễn Văn A', phone: '0901234567', date: '03/02/2026', total: 499000, status: 'Pending' },
-        { id: '#ORD-002', customer: 'Trần Thị B', phone: '0987654321', date: '03/02/2026', total: 1250000, status: 'Completed' },
-        { id: '#ORD-003', customer: 'Lê Văn C', phone: '0912345678', date: '02/02/2026', total: 299000, status: 'Cancelled' },
-        { id: '#ORD-004', customer: 'Phạm Thị D', phone: '0998877665', date: '02/02/2026', total: 850000, status: 'Processing' },
-        { id: '#ORD-005', customer: 'Hoàng Văn E', phone: '0933445566', date: '01/02/2026', total: 150000, status: 'Shipping' },
-    ]);
+    useEffect(() => {
+        const fetchOrders = async () => {
+            try {
+                setLoading(true);
+                setError('');
+                const data = await getAdminOrders({ status: filterStatus });
+                setOrders(Array.isArray(data) ? data : []);
+            } catch (err) {
+                setError(err.message || 'Khong the tai danh sach don hang');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchOrders();
+    }, [filterStatus]);
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -25,10 +37,6 @@ const OrderManager = () => {
             default: return '';
         }
     };
-
-    const filteredOrders = filterStatus === 'All'
-        ? orders
-        : orders.filter(o => o.status === filterStatus);
 
     return (
         <AdminLayout title="Quản Lý Đơn Hàng">
@@ -68,15 +76,30 @@ const OrderManager = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredOrders.map(order => (
+                        {loading && (
+                            <tr>
+                                <td colSpan="7">Dang tai du lieu...</td>
+                            </tr>
+                        )}
+                        {!loading && error && (
+                            <tr>
+                                <td colSpan="7" style={{ color: 'red' }}>{error}</td>
+                            </tr>
+                        )}
+                        {!loading && !error && orders.length === 0 && (
+                            <tr>
+                                <td colSpan="7">Khong co don hang nao</td>
+                            </tr>
+                        )}
+                        {!loading && !error && orders.map(order => (
                             <tr key={order.id}>
-                                <td>{order.id}</td>
+                                <td>#{order.code}</td>
                                 <td>
                                     <div style={{ fontWeight: 600 }}>{order.customer}</div>
                                 </td>
                                 <td>{order.phone}</td>
                                 <td>{order.date}</td>
-                                <td>{order.total.toLocaleString()}đ</td>
+                                <td>{Number(order.total || 0).toLocaleString()}đ</td>
                                 <td>
                                     <span className={`status-badge ${getStatusClass(order.status)}`}>
                                         {order.status}
@@ -85,7 +108,7 @@ const OrderManager = () => {
                                 <td>
                                     <button
                                         className="action-btn"
-                                        onClick={() => navigate(`/admin/orders/${order.id.replace('#', '')}`)}
+                                        onClick={() => navigate(`/admin/orders/${order.id}`)}
                                     >
                                         Xem
                                     </button>

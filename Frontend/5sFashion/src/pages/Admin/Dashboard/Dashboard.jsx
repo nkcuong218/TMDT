@@ -1,42 +1,51 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { getDashboardData } from '../../../services/catalogApi';
 import {
     AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer,
     PieChart, Pie, Cell, Legend
 } from 'recharts';
 
 const AdminDashboard = () => {
-    // Mock Data
-    const stats = [
-        { label: 'Tổng Doanh Thu', value: '125.000.000đ', trend: '+12%', isUp: true },
-        { label: 'Đơn Hàng Mới', value: '38', trend: '+5%', isUp: true },
-        { label: 'Khách Hàng', value: '1,240', trend: '+3%', isUp: true },
-        { label: 'Sản Phẩm', value: '450', trend: '0%', isUp: true }
-    ];
+    const [stats, setStats] = useState([]);
+    const [salesData, setSalesData] = useState([]);
+    const [categoryData, setCategoryData] = useState([]);
+    const [recentOrders, setRecentOrders] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const recentOrders = [
-        { id: '#ORD-001', customer: 'Nguyễn Văn A', date: '03/02/2026', total: '499.000đ', status: 'Pending' },
-        { id: '#ORD-002', customer: 'Trần Thị B', date: '03/02/2026', total: '1.250.000đ', status: 'Completed' },
-        { id: '#ORD-003', customer: 'Lê Văn C', date: '02/02/2026', total: '299.000đ', status: 'Cancelled' },
-        { id: '#ORD-004', customer: 'Phạm Thị D', date: '02/02/2026', total: '850.000đ', status: 'Processing' },
-    ];
+    useEffect(() => {
+        let isMounted = true;
 
-    // Chart Data
-    const salesData = [
-        { name: 'T2', revenue: 4000000, orders: 24 },
-        { name: 'T3', revenue: 3000000, orders: 18 },
-        { name: 'T4', revenue: 5000000, orders: 35 },
-        { name: 'T5', revenue: 2780000, orders: 15 },
-        { name: 'T6', revenue: 6890000, orders: 42 },
-        { name: 'T7', revenue: 8390000, orders: 56 },
-        { name: 'CN', revenue: 9490000, orders: 60 },
-    ];
+        const loadDashboard = async () => {
+            try {
+                setLoading(true);
+                setError('');
+                const data = await getDashboardData();
+                if (!isMounted) {
+                    return;
+                }
+                setStats(data?.stats || []);
+                setSalesData(data?.salesData || []);
+                setCategoryData(data?.categoryData || []);
+                setRecentOrders(data?.recentOrders || []);
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.message || 'Khong the tai dashboard');
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
 
-    const categoryData = [
-        { name: 'Nam', value: 45 },
-        { name: 'Nữ', value: 35 },
-        { name: 'Trẻ em', value: 20 },
-    ];
+        loadDashboard();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
     const getStatusClass = (status) => {
@@ -51,6 +60,8 @@ const AdminDashboard = () => {
 
     return (
         <AdminLayout title="Dashboard">
+            {error && <p style={{ color: 'red', marginBottom: 16 }}>{error}</p>}
+            {loading && <p style={{ marginBottom: 16 }}>Dang tai du lieu dashboard...</p>}
 
             {/* Stats Grid */}
             <div className="admin-stats-grid">

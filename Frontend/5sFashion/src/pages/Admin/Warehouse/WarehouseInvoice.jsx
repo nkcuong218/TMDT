@@ -1,28 +1,51 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getInventoryInvoice } from '../../../services/catalogApi';
 
 const WarehouseInvoice = () => {
     const { id } = useParams(); // Should be invoice ID or transaction ID
     const navigate = useNavigate();
 
-    // Mock Invoice Data
-    const invoice = {
-        id: id || 'HD-00123',
-        date: '2023-11-01 10:00',
-        creator: 'Admin User',
-        supplier: {
-            name: 'Công Ty TNHH May Mặc Việt Nam',
-            address: '123 Đường KCN, Quận 9, TP.HCM',
-            phone: '0909123456',
-            email: 'contact@maymacvietnam.com'
-        },
-        items: [
-            { id: 1, name: 'Áo Khoác Gió Nam Pro-DWR 5S', sku: 'AKG123', unit: 'Cái', quantity: 20, unitPrice: 250000, total: 5000000 },
-        ],
-        totalAmount: 5000000,
-        note: 'Nhập bổ sung cho kho A'
-    };
+    const [invoice, setInvoice] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadInvoice = async () => {
+            try {
+                setLoading(true);
+                setError('');
+                const data = await getInventoryInvoice(id);
+                if (isMounted) {
+                    setInvoice(data);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.message || 'Khong the tai hoa don nhap');
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadInvoice();
+        return () => {
+            isMounted = false;
+        };
+    }, [id]);
+
+    if (loading) {
+        return <AdminLayout>Dang tai hoa don...</AdminLayout>;
+    }
+
+    if (error || !invoice) {
+        return <AdminLayout>{error || 'Khong tim thay hoa don'}</AdminLayout>;
+    }
 
     return (
         <AdminLayout title={`Chi Tiết Hóa Đơn Nhập #${invoice.id}`}>

@@ -44,11 +44,13 @@ public class ProductVariant {
 
     // Tồn kho
     @Column(nullable = false)
+    @Builder.Default
     private Integer stockQuantity = 0;
 
     // Trạng thái
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    @Builder.Default
     private VariantStatus status = VariantStatus.ACTIVE;
 
     // Audit

@@ -63,6 +63,7 @@ public class Product {
 
     // Trạng thái bán
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
 
     // Quan hệ

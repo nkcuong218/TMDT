@@ -3,7 +3,6 @@ package com.tmdt.tmdt.modules.catalog.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -33,8 +32,10 @@ public class Category {
     private List<Category> children;
     // Ẩn hiện danh mục
     @Column(nullable = false)
+    @Builder.Default
     private Boolean isActive = true;
     // Thứ tự hiển thị
+    @Builder.Default
     private Integer sortOrder = 0;
     // Thời điểm tạo
     @Column(nullable = false, updatable = false)

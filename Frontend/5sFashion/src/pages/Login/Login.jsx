@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Login.css';
 import bannerLogin from '../../assets/Herobanner2.jpg';
+import { loginUser } from '../../services/catalogApi';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -9,20 +10,36 @@ const Login = () => {
         email: '',
         password: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Login attempt:', formData);
-        // Add logic here (API call)
-        // Simulating successful login
-        localStorage.setItem('isLoggedIn', 'true');
-        // Redirect to Product List to browse
-        navigate('/products');
+        setIsSubmitting(true);
+        setError('');
+
+        try {
+            const auth = await loginUser({
+                identifier: formData.email,
+                password: formData.password,
+            });
+
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('user_role', auth.role || 'customer');
+            localStorage.setItem('user_id', String(auth.id));
+            localStorage.setItem('auth_token', auth.token || '');
+
+            navigate('/products');
+        } catch (err) {
+            setError(err.message || 'Dang nhap that bai');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -48,6 +65,10 @@ const Login = () => {
                     </Link>
                     <h1 className="login-title">Đăng Nhập</h1>
                     <p className="login-subtitle">Chào mừng bạn quay trở lại!</p>
+
+                    {error ? (
+                        <div style={{ color: '#dc2626', marginBottom: '12px', fontSize: '14px' }}>{error}</div>
+                    ) : null}
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">
@@ -83,7 +104,9 @@ const Login = () => {
                             <a href="#" className="forgot-password">Quên mật khẩu?</a>
                         </div>
 
-                        <button type="submit" className="login-btn">ĐĂNG NHẬP</button>
+                        <button type="submit" className="login-btn" disabled={isSubmitting}>
+                            {isSubmitting ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP'}
+                        </button>
                     </form>
 
                     <div className="social-login">

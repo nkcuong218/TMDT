@@ -4,7 +4,7 @@ import './App.css';
 import Home from './pages/Home/Home';
 import Login from './pages/Login/Login'; // Kept Login import as it's used in a route
 import Register from './pages/Register/Register';
-// import Account from './pages/Account/Account'; // Temporarily disabled
+import Account from './pages/Account/Account';
 import ProductList from './pages/ProductList/ProductList';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
@@ -23,20 +23,13 @@ import WarehouseInvoice from './pages/Admin/Warehouse/WarehouseInvoice';
 import WarehouseImport from './pages/Admin/Warehouse/WarehouseImport';
 
 function App() {
-  // DEV: Force Admin Role for testing
-  React.useEffect(() => {
-    localStorage.setItem('user_role', 'admin');
-    localStorage.setItem('isLoggedIn', 'true');
-  }, []);
-
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* Add more routes here */}
-        {/* <Route path="/account" element={<Account />} /> */}
+        <Route path="/account" element={<Account />} />
         <Route path="/products" element={<ProductList />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/product/:id" element={<ProductDetail />} />

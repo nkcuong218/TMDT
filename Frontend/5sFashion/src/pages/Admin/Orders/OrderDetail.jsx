@@ -1,35 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { getAdminOrderDetail, updateAdminOrderStatus } from '../../../services/catalogApi';
 
 const OrderDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [order, setOrder] = useState(null);
+    const [error, setError] = useState('');
 
-    // Mock Data Fetch Logic
     useEffect(() => {
-        // Simulating API call
-        const mockOrder = {
-            id: id,
-            customer: 'Nguyễn Văn A',
-            phone: '0901234567',
-            email: 'nguyenvana@gmail.com',
-            date: '03/02/2026 14:30',
-            total: 499000,
-            status: 'Pending',
-            paymentMethod: 'COD',
-            shippingFee: 30000,
-            address: '123 Cầu Giấy, Quận Cầu Giấy, Hà Nội',
-            items: [
-                { id: 1, name: 'Áo Khoác Gió Nam Pro-DWR 5S', sku: 'AKG123', size: 'L', color: 'Xanh Đen', quantity: 1, price: 469000 }
-            ],
-            history: [
-                { date: '03/02/2026 14:30', action: 'Đơn hàng được tạo' },
-                { date: '03/02/2026 14:35', action: 'Đã xác nhận thanh toán (COD)' }
-            ]
+        const fetchOrder = async () => {
+            try {
+                setError('');
+                const data = await getAdminOrderDetail(id);
+                setOrder(data);
+            } catch (err) {
+                setError(err.message || 'Khong the tai chi tiet don hang');
+            }
         };
-        setOrder(mockOrder);
+
+        fetchOrder();
     }, [id]);
 
     const getStatusClass = (status) => {
@@ -43,17 +34,27 @@ const OrderDetail = () => {
         }
     };
 
-    const handleStatusUpdate = (newStatus) => {
+    const handleStatusUpdate = async (newStatus) => {
+        if (!order || newStatus === order.status) {
+            return;
+        }
+
         if (window.confirm(`Xác nhận cập nhật trạng thái sang ${newStatus}?`)) {
-            setOrder({ ...order, status: newStatus });
-            alert('Cập nhật thành công!');
+            try {
+                const data = await updateAdminOrderStatus(order.id, newStatus);
+                setOrder(data);
+                alert('Cập nhật thành công!');
+            } catch (err) {
+                alert(err.message || 'Khong the cap nhat trang thai');
+            }
         }
     };
 
+    if (error) return <AdminLayout>{error}</AdminLayout>;
     if (!order) return <AdminLayout>Loading...</AdminLayout>;
 
     return (
-        <AdminLayout title={`Chi Tiết Đơn Hàng ${id}`}>
+        <AdminLayout title={`Chi Tiết Đơn Hàng #${order.code}`}>
             <div style={{ marginBottom: '20px' }}>
                 <button
                     onClick={() => navigate('/admin/orders')}

@@ -1,31 +1,69 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { getWarehouseItems } from '../../../services/catalogApi';
 
 const WarehouseManager = () => {
-    // Mock warehouse data
-    const [warehouseItems, setWarehouseItems] = useState([
-        { id: 1, name: 'Áo Khoác Gió Nam Pro-DWR 5S', sku: 'AKG123', size: 'L', color: 'Đen', quantity: 50, location: 'Kho A - Kệ 1' },
-        { id: 2, name: 'Quần Short Kaki Nam 5S', sku: 'QSK456', size: '32', color: 'Be', quantity: 120, location: 'Kho B - Kệ 3' },
-        { id: 3, name: 'Váy Len Nữ', sku: 'VLN789', size: 'M', color: 'Đỏ', quantity: 30, location: 'Kho A - Kệ 2' },
-        { id: 4, name: 'Áo Thun Basic', sku: 'ATB001', size: 'XL', color: 'Trắng', quantity: 200, location: 'Kho C - Kệ 1' },
-    ]);
+    const [warehouseItems, setWarehouseItems] = useState([]);
+    const [keyword, setKeyword] = useState('');
+    const [locationCode, setLocationCode] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    const loadItems = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            const data = await getWarehouseItems({ keyword: keyword.trim(), locationCode });
+            setWarehouseItems(data || []);
+        } catch (err) {
+            setError(err.message || 'Khong the tai du lieu kho');
+            setWarehouseItems([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadItems();
+    }, []);
+
+    const handleSearch = async (event) => {
+        event.preventDefault();
+        await loadItems();
+    };
 
     return (
         <AdminLayout title="Quản Lý Kho Hàng">
             <div className="admin-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <input type="text" placeholder="Tìm SKU hoặc tên SP..." className="form-input" style={{ width: 300, padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
-                        <select style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <form onSubmit={handleSearch} style={{ display: 'flex', gap: '10px' }}>
+                        <input
+                            type="text"
+                            placeholder="Tìm SKU hoặc tên SP..."
+                            className="form-input"
+                            style={{ width: 300, padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                            value={keyword}
+                            onChange={(e) => setKeyword(e.target.value)}
+                        />
+                        <select
+                            style={{ padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                            value={locationCode}
+                            onChange={(e) => setLocationCode(e.target.value)}
+                        >
                             <option value="">Tất cả kho</option>
-                            <option value="Kho A">Kho A</option>
-                            <option value="Kho B">Kho B</option>
-                            <option value="Kho C">Kho C</option>
+                            <option value="A1">Kho A - Kệ 1</option>
+                            <option value="A2">Kho A - Kệ 2</option>
+                            <option value="B3">Kho B - Kệ 3</option>
+                            <option value="C1">Kho C - Kệ 1</option>
                         </select>
-                    </div>
+                        <button type="submit" className="btn-primary" style={{ height: 40 }}>Lọc</button>
+                    </form>
                     <Link to="/admin/warehouse/import" className="btn-primary" style={{ height: 40, padding: '0 20px', borderRadius: 4, display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>+ Nhập Kho</Link>
                 </div>
+
+                {error && <p style={{ color: 'red', marginBottom: 12 }}>{error}</p>}
+                {loading && <p style={{ marginBottom: 12 }}>Dang tai du lieu kho...</p>}
 
                 <table className="admin-table">
                     <thead>
@@ -40,7 +78,7 @@ const WarehouseManager = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {warehouseItems.map(item => (
+                        {!loading && warehouseItems.map(item => (
                             <tr key={item.id}>
                                 <td>{item.id}</td>
                                 <td>

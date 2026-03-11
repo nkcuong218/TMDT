@@ -1,36 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
 import './Checkout.css';
-
-// Import images
-import p1 from '../../assets/product1.jpg';
-import p2 from '../../assets/product2.jpg';
+import { createOrder, getCart, toCartItemViewModel } from '../../services/catalogApi';
 
 const Checkout = () => {
     const navigate = useNavigate();
-
-    // Mock Data from Cart
-    const cartItems = [
-        {
-            id: 101,
-            title: 'Áo Khoác Gió Nam Pro-DWR 5S',
-            image: p1,
-            color: 'Xanh Rêu',
-            size: 'L',
-            price: 499000,
-            quantity: 1
-        },
-        {
-            id: 102,
-            title: 'Quần Short Kaki Nam 5S Fashion',
-            image: p2,
-            color: 'Be',
-            size: '30',
-            price: 299000,
-            quantity: 2
-        }
-    ];
+    const [cartItems, setCartItems] = useState([]);
+    const [loadingCart, setLoadingCart] = useState(true);
 
     const [savedAddresses, setSavedAddresses] = useState([
         { id: 1, name: 'Nguyễn Văn A', phone: '0901234567', address: 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', type: 'Nhà Riêng' },
@@ -58,6 +35,29 @@ const Checkout = () => {
 
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const shippingFee = subtotal > 500000 ? 0 : 30000;
+
+    useEffect(() => {
+        const userId = localStorage.getItem('user_id');
+        if (!userId) {
+            alert('Vui long dang nhap de thanh toan.');
+            navigate('/login');
+            return;
+        }
+
+        const fetchCart = async () => {
+            try {
+                const data = await getCart(userId);
+                const items = (data?.items || []).map(toCartItemViewModel);
+                setCartItems(items);
+            } catch (err) {
+                alert(err.message || 'Khong the tai gio hang.');
+            } finally {
+                setLoadingCart(false);
+            }
+        };
+
+        fetchCart();
+    }, [navigate]);
 
     // Logic to update discounts
     useEffect(() => {
@@ -107,25 +107,50 @@ const Checkout = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (cartItems.length === 0) {
+            alert('Gio hang dang trong.');
+            return;
+        }
+
+        const userId = Number(localStorage.getItem('user_id'));
+        if (!userId) {
+            alert('Vui long dang nhap de thanh toan.');
+            navigate('/login');
+            return;
+        }
+
         // Final Data Construction
-        let finalAddress = isNewAddress ? { ...formData } : savedAddresses.find(a => a.id === selectedAddressId);
+        let finalAddress = isNewAddress
+            ? { name: formData.fullName, phone: formData.phone, address: formData.address }
+            : savedAddresses.find(a => a.id === selectedAddressId);
 
-        console.log('Order Placed:', {
-            address: finalAddress,
-            items: cartItems,
-            payment: paymentMethod,
-            vouchers: {
-                shipping: selectedShippingVoucherId,
-                order: selectedOrderVoucherId
-            },
-            total: total
-        });
+        if (!finalAddress?.name || !finalAddress?.phone || !finalAddress?.address) {
+            alert('Vui long dien day du thong tin nguoi nhan.');
+            return;
+        }
 
-        alert('Đặt hàng thành công!');
-        navigate('/');
+        try {
+            const payload = {
+                userId,
+                fullName: finalAddress.name,
+                phone: finalAddress.phone,
+                email: formData.email || localStorage.getItem('userEmail') || 'customer@5sfashion.local',
+                address: finalAddress.address,
+                note: formData.note || '',
+                paymentMethod: paymentMethod.toUpperCase(),
+                shippingFee,
+                discountAmount: shippingDiscount + orderDiscount,
+            };
+
+            const response = await createOrder(payload);
+            alert(`Dat hang thanh cong! Ma don: ${response.code}`);
+            navigate('/');
+        } catch (err) {
+            alert(err.message || 'Dat hang that bai.');
+        }
     };
 
     useEffect(() => {
@@ -237,6 +262,7 @@ const Checkout = () => {
                     <div className="checkout-summary">
                         <div className="checkout-section">
                             <div className="section-title">ĐƠN HÀNG ({cartItems.length})</div>
+                            {loadingCart && <div>Dang tai gio hang...</div>}
                             <div className="order-items">
                                 {cartItems.map(item => (
                                     <div key={item.id} className="order-item">

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './Register.css';
 import bannerRegister from '../../assets/Herobanner1.jpg'; // Different banner
+import { registerUser } from '../../services/catalogApi';
 
 const Register = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
@@ -12,16 +14,42 @@ const Register = () => {
         password: '',
         confirmPassword: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('Register attempt:', formData);
-        // Add logic here (API call)
+        setError('');
+        setSuccessMessage('');
+
+        if (formData.password !== formData.confirmPassword) {
+            setError('Mat khau xac nhan khong khop');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            await registerUser({
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: formData.phone,
+                password: formData.password,
+            });
+
+            setSuccessMessage('Dang ky thanh cong. Dang chuyen sang trang dang nhap...');
+            setTimeout(() => navigate('/login'), 1000);
+        } catch (err) {
+            setError(err.message || 'Dang ky that bai');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -47,6 +75,13 @@ const Register = () => {
                     </Link>
                     <h1 className="register-title">Đăng Ký</h1>
                     <p className="register-subtitle">Tạo tài khoản 5S Fashion mới hoàn toàn miễn phí.</p>
+
+                    {error ? (
+                        <div style={{ color: '#dc2626', marginBottom: '12px', fontSize: '14px' }}>{error}</div>
+                    ) : null}
+                    {successMessage ? (
+                        <div style={{ color: '#15803d', marginBottom: '12px', fontSize: '14px' }}>{successMessage}</div>
+                    ) : null}
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-row">
@@ -128,7 +163,9 @@ const Register = () => {
                             />
                         </div>
 
-                        <button type="submit" className="register-btn">ĐĂNG KÝ NGAY</button>
+                        <button type="submit" className="register-btn" disabled={isSubmitting}>
+                            {isSubmitting ? 'ĐANG XỬ LÝ...' : 'ĐĂNG KÝ NGAY'}
+                        </button>
                     </form>
 
                     <div className="login-link">

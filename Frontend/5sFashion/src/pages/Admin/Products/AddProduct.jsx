@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
 import { useNavigate } from 'react-router-dom';
+import { createProduct, getCategories } from '../../../services/catalogApi';
 import './AddProduct.css';
 
 const AddProduct = () => {
     const navigate = useNavigate();
     const [sizeInput, setSizeInput] = useState('');
     const [colorInput, setColorInput] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         name: '',
         sku: '',
-        category: 'Nam',
+        categoryId: '',
         price: '',
+        originalPrice: '',
         stock: 0,
         colors: [],
         sizes: [],
@@ -23,6 +28,38 @@ const AddProduct = () => {
         },
         image: null
     });
+
+    React.useEffect(() => {
+        let isMounted = true;
+
+        const loadCategories = async () => {
+            try {
+                setLoadingCategories(true);
+                const data = await getCategories();
+                if (!isMounted) {
+                    return;
+                }
+
+                setCategories(data || []);
+                if (data?.length) {
+                    setFormData((prev) => ({ ...prev, categoryId: String(data[0].id) }));
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.message || 'Không thể tải danh mục');
+                }
+            } finally {
+                if (isMounted) {
+                    setLoadingCategories(false);
+                }
+            }
+        };
+
+        loadCategories();
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -75,30 +112,48 @@ const AddProduct = () => {
         }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const payload = {
-            ...formData,
-            colorOptions: formData.colors,
-            sizeOptions: formData.sizes,
-            description: [
-                formData.descriptionDetails.highlights && `Điểm nổi bật: ${formData.descriptionDetails.highlights}`,
-                formData.descriptionDetails.material && `Chất liệu: ${formData.descriptionDetails.material}`,
-                formData.descriptionDetails.fit && `Form dáng: ${formData.descriptionDetails.fit}`,
-                formData.descriptionDetails.careInstructions && `Hướng dẫn bảo quản: ${formData.descriptionDetails.careInstructions}`
-            ].filter(Boolean).join('\n')
-        };
+    const slugify = (value) => {
+        return value
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    };
 
-        console.log('Submitting Product:', payload);
-        // Here you would call an API
-        alert('Đã thêm sản phẩm thành công! (Mô phỏng)');
-        navigate('/admin/products');
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
+
+        try {
+            const cleanSlug = slugify(formData.name || formData.sku || 'san-pham');
+            const payload = {
+                name: formData.name,
+                slug: `${cleanSlug}-${Date.now()}`,
+                skuRoot: formData.sku,
+                categoryId: Number(formData.categoryId),
+                brand: '5S Fashion',
+                basePrice: Number(formData.price || 0),
+                originalPrice: formData.originalPrice ? Number(formData.originalPrice) : Number(formData.price || 0),
+                descriptionHighlights: formData.descriptionDetails.highlights,
+                descriptionMaterial: formData.descriptionDetails.material,
+                descriptionFit: formData.descriptionDetails.fit,
+                descriptionCare: formData.descriptionDetails.careInstructions,
+            };
+
+            await createProduct(payload);
+            alert('Đã thêm sản phẩm thành công!');
+            navigate('/admin/products');
+        } catch (err) {
+            setError(err.message || 'Tạo sản phẩm thất bại');
+        }
     };
 
     return (
         <AdminLayout title="Thêm Sản Phẩm Mới">
             <div className="admin-card">
                 <form onSubmit={handleSubmit} className="add-product-form">
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
 
                     <div className="form-group">
                         <label className="form-label">Tên Sản Phẩm</label>
@@ -129,16 +184,15 @@ const AddProduct = () => {
                         <div className="form-group">
                             <label className="form-label">Danh Mục</label>
                             <select
-                                name="category"
-                                value={formData.category}
+                                name="categoryId"
+                                value={formData.categoryId}
                                 onChange={handleChange}
                                 className="form-control"
+                                disabled={loadingCategories}
                             >
-                                <option value="Nam">Nam</option>
-                                <option value="Nữ">Nữ</option>
-                                <option value="Bé Trai">Bé Trai</option>
-                                <option value="Bé Gái">Bé Gái</option>
-                                <option value="Phụ Kiện">Phụ Kiện</option>
+                                {!loadingCategories && categories.map((category) => (
+                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
@@ -156,6 +210,20 @@ const AddProduct = () => {
                                 placeholder="0"
                             />
                         </div>
+                        <div className="form-group">
+                            <label className="form-label">Giá Niêm Yết (VNĐ)</label>
+                            <input
+                                type="number"
+                                name="originalPrice"
+                                value={formData.originalPrice}
+                                onChange={handleChange}
+                                className="form-input form-control"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="form-grid">
                         <div className="form-group">
                             <label className="form-label">Kích Cỡ</label>
                             <div className="tag-input-wrapper">

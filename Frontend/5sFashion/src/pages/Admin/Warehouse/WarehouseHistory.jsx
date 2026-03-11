@@ -1,46 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getWarehouseHistory } from '../../../services/catalogApi';
 
 const WarehouseHistory = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Mock Product Data (In real app, fetch by ID)
     const [product, setProduct] = useState(null);
     const [history, setHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        // Simulating API fetch
-        const mockProduct = {
-            id: id,
-            name: 'Áo Khoác Gió Nam Pro-DWR 5S',
-            sku: 'AKG123',
-            size: 'L',
-            color: 'Đen',
-            currentStock: 50
-        };
-        setProduct(mockProduct);
+        let isMounted = true;
 
-        const mockHistory = [
-            { id: 1, date: '2023-10-25 14:30', type: 'Nhập', quantity: 100, remaining: 100, note: 'Nhập hàng mới từ NCC', user: 'Admin' },
-            { id: 2, date: '2023-10-26 09:15', type: 'Xuất', quantity: -2, remaining: 98, note: 'Đơn hàng #DH-001', user: 'System' },
-            { id: 3, date: '2023-10-26 10:00', type: 'Xuất', quantity: -5, remaining: 93, note: 'Đơn hàng #DH-005', user: 'System' },
-            { id: 4, date: '2023-10-27 16:20', type: 'Xuất', quantity: -10, remaining: 83, note: 'Xuất chuyển kho CN2', user: 'Kho' },
-            { id: 5, date: '2023-10-28 08:00', type: 'Kiểm', quantity: -3, remaining: 80, note: 'Điều chỉnh sau kiểm kê', user: 'Admin' }, // Điều chỉnh giảm
-            { id: 6, date: '2023-11-01 10:00', type: 'Nhập', quantity: 20, remaining: 100, note: 'Nhập bổ sung', user: 'Admin' },
-            { id: 7, date: '2023-11-02 11:30', type: 'Xuất', quantity: -50, remaining: 50, note: 'Xuất bán sỉ', user: 'Sales' },
-        ];
-        // Sort newest first
-        setHistory(mockHistory.sort((a, b) => new Date(b.date) - new Date(a.date)));
+        const loadHistory = async () => {
+            try {
+                setLoading(true);
+                setError('');
+                const response = await getWarehouseHistory(id);
+                if (!isMounted) {
+                    return;
+                }
+                setProduct(response?.product || null);
+                setHistory(response?.history || []);
+            } catch (err) {
+                if (isMounted) {
+                    setError(err.message || 'Khong the tai lich su kho');
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadHistory();
+
+        return () => {
+            isMounted = false;
+        };
 
     }, [id]);
 
     const handleViewInvoice = (item) => {
-        // Navigate to the invoice page using the item's ID or a specific invoice ID if available
-        // For mock purposes, using the history item ID
-        navigate(`/admin/warehouse/invoice/${item.id}`);
+        if (!item.importId) {
+            return;
+        }
+        navigate(`/admin/warehouse/invoice/${item.importId}`);
     };
+
+    if (loading) {
+        return <AdminLayout>Dang tai...</AdminLayout>;
+    }
+
+    if (error) {
+        return <AdminLayout>{error}</AdminLayout>;
+    }
 
     if (!product) {
         return <AdminLayout>Loading...</AdminLayout>;
@@ -113,7 +130,7 @@ const WarehouseHistory = () => {
                                     <td>{item.note}</td>
                                     <td>{item.user}</td>
                                     <td>
-                                        {item.type === 'Nhập' && (
+                                        {item.type === 'Nhập' && item.importId && (
                                             <button
                                                 onClick={() => handleViewInvoice(item)}
                                                 style={{

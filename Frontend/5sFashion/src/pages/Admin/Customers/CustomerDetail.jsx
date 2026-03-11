@@ -1,35 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { getAdminCustomerDetail, toggleAdminCustomerStatus } from '../../../services/catalogApi';
 
 const CustomerDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [customer, setCustomer] = useState(null);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        // Mock API Call
-        const mockCustomer = {
-            id: id,
-            name: 'Nguyễn Văn A',
-            email: 'nguyenvana@gmail.com',
-            phone: '0901234567',
-            address: '123 Cầu Giấy, Hà Nội',
-            joinDate: '20/01/2026',
-            status: 'Active',
-            stats: {
-                totalOrders: 5,
-                totalSpent: 2500000,
-                lastOrderDate: '03/02/2026'
-            },
-            orders: [
-                { id: '#ORD-001', date: '03/02/2026', total: 499000, status: 'Pending' },
-                { id: '#ORD-012', date: '25/01/2026', total: 1200000, status: 'Completed' },
-                { id: '#ORD-025', date: '10/01/2026', total: 800000, status: 'Completed' }
-            ]
+        const loadCustomer = async () => {
+            setError('');
+            try {
+                const data = await getAdminCustomerDetail(id);
+                setCustomer(data);
+            } catch (err) {
+                setError(err.message || 'Khong the tai chi tiet khach hang');
+            }
         };
-        setCustomer(mockCustomer);
+
+        loadCustomer();
     }, [id]);
+
+    const handleToggleStatus = async () => {
+        try {
+            await toggleAdminCustomerStatus(id);
+            const refreshed = await getAdminCustomerDetail(id);
+            setCustomer(refreshed);
+        } catch (err) {
+            window.alert(err.message || 'Cap nhat trang thai that bai');
+        }
+    };
 
     const getStatusClass = (status) => {
         switch (status) {
@@ -41,7 +43,7 @@ const CustomerDetail = () => {
         }
     };
 
-    if (!customer) return <AdminLayout>Loading...</AdminLayout>;
+    if (!customer) return <AdminLayout>{error || 'Loading...'}</AdminLayout>;
 
     return (
         <AdminLayout title={`Chi Tiết Khách Hàng #${id}`}>
@@ -96,8 +98,8 @@ const CustomerDetail = () => {
 
                         <div style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
                             {customer.status === 'Active' ?
-                                <button className="btn-secondary" style={{ width: '100%', color: 'red', borderColor: 'red' }}>Khóa Tài Khoản</button> :
-                                <button className="btn-secondary" style={{ width: '100%', color: 'green', borderColor: 'green' }}>Mở Khóa Tài Khoản</button>
+                                <button className="btn-secondary" style={{ width: '100%', color: 'red', borderColor: 'red' }} onClick={handleToggleStatus}>Khoa Tai Khoan</button> :
+                                <button className="btn-secondary" style={{ width: '100%', color: 'green', borderColor: 'green' }} onClick={handleToggleStatus}>Mo Khoa Tai Khoan</button>
                             }
                         </div>
                     </div>
@@ -144,7 +146,7 @@ const CustomerDetail = () => {
                                     <td>
                                         <button
                                             className="action-btn"
-                                            onClick={() => navigate(`/admin/orders/${order.id.replace('#', '')}`)}
+                                            onClick={() => navigate(`/admin/orders/${order.orderId}`)}
                                         >
                                             Xem
                                         </button>

@@ -1,50 +1,52 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../../components/Layout/Layout';
+import { getCart, removeCartItem, toCartItemViewModel, updateCartItem } from '../../services/catalogApi';
 import './Cart.css';
-
-// Import mock images
-import p1 from '../../assets/product1.jpg';
-import p2 from '../../assets/product2.jpg';
 
 const Cart = () => {
     const navigate = useNavigate();
-    // Mock Cart Data
-    const [cartItems, setCartItems] = useState([
-        {
-            id: 101,
-            product_id: 1,
-            title: 'Áo Khoác Gió Nam Pro-DWR 5S',
-            image: p1,
-            color: 'Xanh Rêu',
-            size: 'L',
-            price: 499000,
-            quantity: 1
-        },
-        {
-            id: 102,
-            product_id: 2,
-            title: 'Quần Short Kaki Nam 5S Fashion',
-            image: p2,
-            color: 'Be',
-            size: '30',
-            price: 299000,
-            quantity: 2
-        }
-    ]);
+    const userId = Number(localStorage.getItem('user_id') || 1);
+    const [cartItems, setCartItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
-    const handleQuantityChange = (id, delta) => {
-        setCartItems(prev => prev.map(item => {
-            if (item.id === id) {
-                const newQty = Math.max(1, item.quantity + delta);
-                return { ...item, quantity: newQty };
-            }
-            return item;
-        }));
+    const loadCart = async () => {
+        try {
+            setLoading(true);
+            setError('');
+            const cart = await getCart(userId);
+            setCartItems((cart?.items || []).map(toCartItemViewModel));
+        } catch (err) {
+            setError(err.message || 'Khong the tai gio hang');
+            setCartItems([]);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const handleRemove = (id) => {
-        setCartItems(prev => prev.filter(item => item.id !== id));
+    const handleQuantityChange = async (id, delta) => {
+        const item = cartItems.find((entry) => entry.id === id);
+        if (!item) {
+            return;
+        }
+
+        const newQty = Math.max(1, item.quantity + delta);
+        try {
+            await updateCartItem(userId, id, newQty);
+            await loadCart();
+        } catch (err) {
+            setError(err.message || 'Cap nhat so luong that bai');
+        }
+    };
+
+    const handleRemove = async (id) => {
+        try {
+            await removeCartItem(userId, id);
+            await loadCart();
+        } catch (err) {
+            setError(err.message || 'Xoa san pham that bai');
+        }
     };
 
     const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -53,6 +55,7 @@ const Cart = () => {
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        loadCart();
     }, []);
 
     return (
@@ -61,7 +64,10 @@ const Cart = () => {
                 <div className="container">
                     <h1 className="cart-title">Giỏ Hàng Của Bạn ({cartItems.length} sản phẩm)</h1>
 
-                    {cartItems.length > 0 ? (
+                    {error && <p style={{ color: 'red', marginBottom: '12px' }}>{error}</p>}
+                    {loading && <p>Dang tai gio hang...</p>}
+
+                    {!loading && cartItems.length > 0 ? (
                         <div className="cart-layout">
                             {/* Items List */}
                             <div className="cart-items-section">
