@@ -1,73 +1,178 @@
-import React from 'react';
-import { Link, useLocation, Navigate } from 'react-router-dom';
-import './AdminLayout.css';
+import { Link, useLocation, Navigate } from 'react-router-dom'
+import logo from '../../assets/logo.png'
+import { Box } from '@mui/material'
+import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined'
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined'
+import WarehouseOutlinedIcon from '@mui/icons-material/WarehouseOutlined'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
 
-import logo from '../../assets/logo.png';
+export const adminCardSx = {
+  background: 'var(--bg-surface)',
+  borderRadius: '8px',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+  p: 3,
+  mb: 3
+}
+
+export const adminTableSx = {
+  width: '100%',
+  borderCollapse: 'collapse',
+  '& th': {
+    textAlign: 'left',
+    p: '12px 16px',
+    background: 'var(--bg-muted)',
+    color: 'var(--text-light)',
+    fontSize: '12px',
+    fontWeight: 600,
+    textTransform: 'uppercase',
+    borderBottom: '1px solid var(--border-color)'
+  },
+  '& td': {
+    p: '14px 16px',
+    borderBottom: '1px solid var(--border-color)',
+    fontSize: '14px',
+    color: 'var(--text-main)'
+  }
+}
+
+export const actionButtonSx = {
+  px: 1.5,
+  py: 0.75,
+  border: '1px solid #d1d5db',
+  borderRadius: '4px',
+  bgcolor: 'var(--bg-surface)',
+  color: 'var(--text-main)',
+  minWidth: 'auto',
+  textTransform: 'none',
+  fontSize: '13px',
+  mr: 0.5,
+  '&:hover': { bgcolor: 'var(--bg-muted)' }
+}
+
+export const formInputSx = {
+  width: '100%',
+  px: 1.25,
+  py: 1,
+  borderRadius: '4px',
+  border: '1px solid #d1d5db',
+  background: 'var(--bg-surface)',
+  fontSize: '14px'
+}
+
+export const primaryButtonSx = {
+  background: '#ef4444',
+  color: '#fff',
+  borderRadius: '4px',
+  px: 2,
+  py: 1,
+  textTransform: 'none',
+  '&:hover': { background: '#dc2626' }
+}
+
+export const secondaryButtonSx = {
+  border: '1px solid #d1d5db',
+  background: 'var(--bg-surface)',
+  color: 'var(--text-main)',
+  borderRadius: '4px',
+  px: 2,
+  py: 1,
+  textTransform: 'none',
+  '&:hover': { background: 'var(--bg-muted)' }
+}
+
+export const statusBadgeSx = (statusClass) => {
+  const palette = {
+    'status-success': { background: '#d1fae5', color: '#065f46' },
+    'status-warning': { background: '#fef3c7', color: '#92400e' },
+    'status-danger': { background: '#fee2e2', color: '#b91c1c' }
+  }
+  return {
+    px: 1.25,
+    py: 0.5,
+    borderRadius: '999px',
+    fontSize: '12px',
+    fontWeight: 600,
+    ...(palette[statusClass] || { background: '#f3f4f6', color: '#374151' })
+  }
+}
+
 
 const AdminLayout = ({ children, title }) => {
-    const location = useLocation();
+  const location = useLocation()
 
-    // RBAC Check
-    // For development, we ensure 'user_role' is checked.
-    // If not admin, redirect to home.
-    const role = localStorage.getItem('user_role');
-    if (role !== 'admin' && role !== 'ADMIN') {
-        // You might want to remove the alert for production or smoother UX
-        // alert('Access Denied: Admin role required.'); 
-        return <Navigate to="/" replace />;
-    }
+  // RBAC Check
+  // For development, we ensure 'user_role' is checked.
+  // If not admin, redirect to home.
+  const role = localStorage.getItem('user_role')
+  if (role !== 'admin' && role !== 'ADMIN') {
+    // You might want to remove the alert for production or smoother UX
+    // alert('Access Denied: Admin role required.');
+    return <Navigate to="/" replace />
+  }
 
-    const menuItems = [
-        { path: '/admin', label: 'Dashboard', icon: 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z' },
-        { path: '/admin/products', label: 'Sản Phẩm', icon: 'M20 6h-2.18c.11-.31.18-.65.18-1 0-1.66-1.34-3-3-3-1.05 0-1.96.54-2.5 1.35l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z' },
-        { path: '/admin/orders', label: 'Đơn Hàng', icon: 'M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z' },
-        { path: '/admin/users', label: 'Khách Hàng', icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z' },
-        { path: '/admin/warehouse', label: 'Quản Lý Kho', icon: 'M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4zm0 15l3-3V9l-3 3v7zm8 0h-2v-4h2v4zm2 0h-2v-4h2v4zm0-6h-2v-4h2v4zm2-6h-2V5h2v2z' },
-    ];
+  const menuItems = [
+    { path: '/admin', label: 'Dashboard', icon: DashboardRoundedIcon },
+    { path: '/admin/products', label: 'Sản Phẩm', icon: Inventory2OutlinedIcon },
+    { path: '/admin/orders', label: 'Đơn Hàng', icon: ReceiptLongOutlinedIcon },
+    { path: '/admin/users', label: 'Khách Hàng', icon: PeopleAltOutlinedIcon },
+    { path: '/admin/warehouse', label: 'Quản Lý Kho', icon: WarehouseOutlinedIcon }
+  ]
 
-    return (
-        <div className="admin-container">
-            {/* Sidebar */}
-            <div className="admin-sidebar">
-                <div className="admin-sidebar-header">
-                    <img src={logo} alt="5S Admin" className="admin-logo" />
-                </div>
-                <nav className="admin-nav">
-                    {menuItems.map(item => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`admin-nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                        >
-                            <svg className="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                                <path d={item.icon} />
-                            </svg>
-                            {item.label}
-                        </Link>
-                    ))}
-                    <div style={{ borderTop: '1px solid #374151', margin: '10px 0' }}></div>
-                    <Link to="/" className="admin-nav-item">
-                        <svg className="nav-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg>
-                        Về Trang Chủ
-                    </Link>
-                </nav>
-            </div>
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'var(--bg-body)', fontFamily: 'Inter, sans-serif' }}>
+      {/* Sidebar */}
+      <Box sx={{ width: 250, bgcolor: 'var(--bg-surface)', color: 'var(--text-main)', display: 'flex', flexDirection: 'column', position: 'fixed', height: '100vh', left: 0, top: 0, borderRight: '1px solid var(--border-color)', boxShadow: '2px 0 5px rgba(0, 0, 0, 0.02)' }}>
+        <Box sx={{ height: 64, display: 'flex', alignItems: 'center', px: '20px', borderBottom: '1px solid var(--border-color)' }}>
+          <Box component="img" src={logo} alt="5S Admin" sx={{ height: 32, objectFit: 'contain' }} />
+        </Box>
+        <Box component="nav" sx={{ flex: 1, py: '20px' }}>
+          {menuItems.map(item => (
+            <Link
+              key={item.path}
+              to={item.path}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                padding: '12px 20px',
+                color: location.pathname === item.path ? 'var(--primary-color)' : 'var(--text-light)',
+                textDecoration: 'none',
+                transition: 'all 0.2s',
+                fontSize: '15px',
+                gap: '12px',
+                fontWeight: 500,
+                background: location.pathname === item.path ? 'rgba(218, 37, 29, 0.12)' : 'transparent',
+                borderLeft: location.pathname === item.path ? '3px solid var(--primary-color)' : '3px solid transparent'
+              }}
+            >
+              <item.icon sx={{ width: 20, height: 20 }} />
+              {item.label}
+            </Link>
+          ))}
+          <Box sx={{ borderTop: '1px solid var(--border-color)', my: '10px' }}></Box>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', padding: '12px 20px', color: 'var(--text-light)', textDecoration: 'none', fontSize: '15px', gap: '12px', fontWeight: 500 }}>
+            <HomeOutlinedIcon sx={{ width: 20, height: 20 }} />
+                      Về Trang Chủ
+          </Link>
+        </Box>
+      </Box>
 
-            {/* Main Content */}
-            <div className="admin-content">
-                <header className="admin-header">
-                    <div className="header-title">{title || 'Dashboard'}</div>
-                    <div className="admin-user">
-                        <span>Admin User</span>
-                        <div style={{ width: 32, height: 32, borderRadius: 50, background: '#ddd' }}></div>
-                    </div>
-                </header>
-                <main className="admin-main">
-                    {children}
-                </main>
-            </div>
-        </div>
-    );
-};
+      {/* Main Content */}
+      <Box sx={{ flex: 1, ml: '250px', display: 'flex', flexDirection: 'column' }}>
+        <Box component="header" sx={{ height: 64, background: 'var(--bg-surface)', boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: '30px', borderBottom: '1px solid var(--border-color)' }}>
+          <Box sx={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-main)' }}>{title || 'Dashboard'}</Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: 500 }}>
+            <Box component="span">Admin User</Box>
+            <Box style={{ width: 32, height: 32, borderRadius: 50, background: '#ddd' }}></Box>
+          </Box>
+        </Box>
+        <Box component="main" sx={{ p: '30px', flex: 1, overflowY: 'auto' }}>
+          {children}
+        </Box>
+      </Box>
+    </Box>
+  )
+}
 
-export default AdminLayout;
+export default AdminLayout

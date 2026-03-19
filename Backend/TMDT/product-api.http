@@ -1,0 +1,65 @@
+@baseUrl = http://localhost:8080
+
+### Get all products
+GET {{baseUrl}}/api/products
+
+### Get all active products
+GET {{baseUrl}}/api/products/active
+
+### Search products (keyword in name or slug)
+GET {{baseUrl}}/api/products/search?q=ao&activeOnly=true
+
+### Filter by category
+GET {{baseUrl}}/api/products/category/1?activeOnly=true
+
+### Get by id
+GET {{baseUrl}}/api/products/1
+
+### Get by slug
+GET {{baseUrl}}/api/products/slug/ao-thun-basic
+
+### Create product
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "name": "Ao thun basic",
+  "slug": "ao-thun-basic",
+  "skuRoot": "ATB",
+  "brand": "5S Fashion",
+  "basePrice": 199000,
+  "originalPrice": 249000,
+  "primaryImage": "https://example.com/aothun.jpg",
+  "descriptionHighlights": "Mem, thoang, mac hang ngay",
+  "descriptionMaterial": "Cotton",
+  "descriptionFit": "Regular",
+  "descriptionCare": "Giat nhe",
+  "isActive": true
+}
+
+### Update product
+PUT {{baseUrl}}/api/products/1
+Content-Type: application/json
+
+{
+  "categoryId": 1,
+  "name": "Ao thun basic update",
+  "slug": "ao-thun-basic",
+  "skuRoot": "ATB",
+  "brand": "5S Fashion",
+  "basePrice": 219000,
+  "originalPrice": 259000,
+  "primaryImage": "https://example.com/aothun-update.jpg",
+  "descriptionHighlights": "Mem, thoang, de phoi",
+  "descriptionMaterial": "Cotton",
+  "descriptionFit": "Slim",
+  "descriptionCare": "Giat nhe",
+  "isActive": true
+}
+
+### Set active/inactive
+PATCH {{baseUrl}}/api/products/1/active?value=false
+
+### Delete product
+DELETE {{baseUrl}}/api/products/1

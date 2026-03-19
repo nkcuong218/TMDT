@@ -1,17 +1,17 @@
-import React from 'react';
-import Header from '../Header/Header';
-import Footer from '../Footer/Footer';
+import Header from '../Header/Header'
+import Footer from '../Footer/Footer'
+import { Box } from '@mui/material'
 
 const Layout = ({ children }) => {
-    return (
-        <>
-            <Header />
-            <main>
-                {children}
-            </main>
-            <Footer />
-        </>
-    );
-};
+  return (
+    <>
+      <Header />
+      <Box component="main">
+        {children}
+      </Box>
+      <Footer />
+    </>
+  )
+}
 
-export default Layout;
+export default Layout
