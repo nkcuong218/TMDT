@@ -1,94 +1,123 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import AdminLayout from '../../../components/AdminLayout/AdminLayout';
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import AdminLayout from '../../../components/AdminLayout/AdminLayout'
+import { adminCardSx, adminTableSx, actionButtonSx, formInputSx } from '../../../components/AdminLayout/AdminLayout'
+import { getAdminCustomers, toggleAdminCustomerStatus } from '../../../services/catalogApi'
+import { Box, Button, Table, TableHead, TableBody, TableRow, TableCell, InputBase } from '@mui/material'
 
 const CustomerManager = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate()
 
-    // Mock Customers State
-    const [customers, setCustomers] = useState([
-        { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@gmail.com', phone: '0901234567', totalOrders: 5, totalSpent: 2500000, status: 'Active' },
-        { id: 2, name: 'Trần Thị B', email: 'tranthib@gmail.com', phone: '0987654321', totalOrders: 12, totalSpent: 15200000, status: 'Active' },
-        { id: 3, name: 'Lê Văn C', email: 'levanc@gmail.com', phone: '0912345678', totalOrders: 1, totalSpent: 299000, status: 'Blocked' },
-        { id: 4, name: 'Phạm Thị D', email: 'phamthid@gmail.com', phone: '0998877665', totalOrders: 3, totalSpent: 1200000, status: 'Active' },
-    ]);
+  const [customers, setCustomers] = useState([])
+  const [keyword, setKeyword] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
-    const handleToggleStatus = (id) => {
-        const customer = customers.find(c => c.id === id);
-        const newStatus = customer.status === 'Active' ? 'Blocked' : 'Active';
-        const action = newStatus === 'Blocked' ? 'Khóa' : 'Mở khóa';
+  useEffect(() => {
+    const loadCustomers = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const data = await getAdminCustomers({ keyword })
+        setCustomers(Array.isArray(data) ? data : [])
+      } catch (err) {
+        setError(err.message || 'Khong the tai danh sach khach hang')
+      } finally {
+        setLoading(false)
+      }
+    }
 
-        if (window.confirm(`Bạn có chắc muốn ${action} khách hàng ${customer.name}?`)) {
-            setCustomers(customers.map(c =>
-                c.id === id ? { ...c, status: newStatus } : c
-            ));
-        }
-    };
+    const timer = setTimeout(loadCustomers, 250)
+    return () => clearTimeout(timer)
+  }, [keyword])
 
-    return (
-        <AdminLayout title="Quản Lý Khách Hàng">
-            <div className="admin-card">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-                    <div style={{ display: 'flex', gap: '10px' }}>
-                        <input type="text" placeholder="Tìm kiếm khách hàng..." className="form-input" style={{ width: 300 }} />
-                    </div>
-                </div>
+  const handleToggleStatus = async (id) => {
+    const customer = customers.find(c => c.id === id)
+    const newStatus = customer.status === 'Active' ? 'Blocked' : 'Active'
+    const action = newStatus === 'Blocked' ? 'Khoa' : 'Mo khoa'
 
-                <table className="admin-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Họ và Tên</th>
-                            <th>Email</th>
-                            <th>Số Điện Thoại</th>
-                            <th>Đơn Hàng</th>
-                            <th>Tổng Chi</th>
-                            <th>Trạng Thái</th>
-                            <th>Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.map(c => (
-                            <tr key={c.id}>
-                                <td>{c.id}</td>
-                                <td>
-                                    <div style={{ fontWeight: 600 }}>{c.name}</div>
-                                </td>
-                                <td>{c.email}</td>
-                                <td>{c.phone}</td>
-                                <td>{c.totalOrders}</td>
-                                <td>{c.totalSpent.toLocaleString()}đ</td>
-                                <td>
-                                    <span style={{
-                                        padding: '4px 10px',
-                                        borderRadius: '10px',
-                                        fontSize: '12px',
-                                        background: c.status === 'Active' ? '#d1fae5' : '#fee2e2',
-                                        color: c.status === 'Active' ? '#065f46' : '#b91c1c'
-                                    }}>
-                                        {c.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button
-                                        className="action-btn"
-                                        onClick={() => navigate(`/admin/users/${c.id}`)}
-                                    >
+    if (window.confirm(`Ban co chac muon ${action} khach hang ${customer.name}?`)) {
+      try {
+        const updated = await toggleAdminCustomerStatus(id)
+        setCustomers(customers.map(c =>
+          c.id === id ? { ...c, status: updated.status } : c
+        ))
+      } catch (err) {
+        window.alert(err.message || 'Cap nhat trang thai that bai')
+      }
+    }
+  }
+
+  return (
+    <AdminLayout title="Quản Lý Khách Hàng">
+      <Box sx={adminCardSx}>
+        <Box style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <Box style={{ display: 'flex', gap: '10px' }}>
+            <InputBase
+              type="text"
+              placeholder="Tim kiem khach hang..."
+              sx={{ ...formInputSx, width: 300 }}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+            />
+          </Box>
+        </Box>
+
+        {error ? <Box style={{ color: '#dc2626', marginBottom: '12px' }}>{error}</Box> : null}
+        {loading ? <Box>Dang tai du lieu...</Box> : null}
+
+        <Table sx={adminTableSx}>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Họ và Tên</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Số Điện Thoại</TableCell>
+              <TableCell>Đơn Hàng</TableCell>
+              <TableCell>Tổng Chi</TableCell>
+              <TableCell>Trạng Thái</TableCell>
+              <TableCell>Hành Động</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {customers.map(c => (
+              <TableRow key={c.id}>
+                <TableCell>{c.id}</TableCell>
+                <TableCell>
+                  <Box style={{ fontWeight: 600 }}>{c.name}</Box>
+                </TableCell>
+                <TableCell>{c.email}</TableCell>
+                <TableCell>{c.phone}</TableCell>
+                <TableCell>{c.totalOrders}</TableCell>
+                <TableCell>{c.totalSpent.toLocaleString()}đ</TableCell>
+                <TableCell>
+                  <Box component="span" style={{
+                    padding: '4px 10px',
+                    borderRadius: '10px',
+                    fontSize: '12px',
+                    background: c.status === 'Active' ? '#d1fae5' : '#fee2e2',
+                    color: c.status === 'Active' ? '#065f46' : '#b91c1c'
+                  }}>
+                    {c.status}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Button sx={actionButtonSx} onClick={() => navigate(`/admin/users/${c.id}`)}>
                                         Xem
-                                    </button>
-                                    {c.status === 'Active' ? (
-                                        <button className="action-btn" style={{ color: 'red' }} onClick={() => handleToggleStatus(c.id)}>Khóa</button>
-                                    ) : (
-                                        <button className="action-btn" style={{ color: 'green' }} onClick={() => handleToggleStatus(c.id)}>Mở</button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        </AdminLayout>
-    );
-};
+                  </Button>
+                  {c.status === 'Active' ? (
+                    <Button sx={{ ...actionButtonSx, color: 'red' }} onClick={() => handleToggleStatus(c.id)}>Khoa</Button>
+                  ) : (
+                    <Button sx={{ ...actionButtonSx, color: 'green' }} onClick={() => handleToggleStatus(c.id)}>Mo</Button>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+    </AdminLayout>
+  )
+}
 
-export default CustomerManager;
+export default CustomerManager

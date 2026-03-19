@@ -1,119 +1,144 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './Login.css';
-import bannerLogin from '../../assets/Herobanner2.jpg';
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import bannerLogin from '../../assets/Herobanner2.jpg'
+import { loginUser } from '../../services/catalogApi'
+import { Box, Typography, Button, Checkbox, InputBase } from '@mui/material'
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
+import GoogleIcon from '@mui/icons-material/Google'
+import FacebookRoundedIcon from '@mui/icons-material/FacebookRounded'
 
 const Login = () => {
-    const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
+  const navigate = useNavigate()
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Login attempt:', formData);
-        // Add logic here (API call)
-        // Simulating successful login
-        localStorage.setItem('isLoggedIn', 'true');
-        // Redirect to Product List to browse
-        navigate('/products');
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setError('')
 
-    return (
-        <div className="login-container">
-            <div className="login-wrapper">
-                {/* Left Side: Visual */}
-                <div className="login-image">
-                    <img src={bannerLogin} alt="Fashion Model" />
-                    <div className="login-overlay">
-                        <h2>5S FASHION</h2>
-                        <p>Trải nghiệm phong cách thời trang nam đẳng cấp.</p>
-                    </div>
-                </div>
+    try {
+      const auth = await loginUser({
+        identifier: formData.email,
+        password: formData.password
+      })
 
-                {/* Right Side: Form */}
-                <div className="login-form-container">
-                    <Link to="/" className="home-link">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                        </svg>
-                        Trang chủ
-                    </Link>
-                    <h1 className="login-title">Đăng Nhập</h1>
-                    <p className="login-subtitle">Chào mừng bạn quay trở lại!</p>
+      localStorage.setItem('isLoggedIn', 'true')
+      localStorage.setItem('user_role', auth.role || 'customer')
+      localStorage.setItem('user_id', String(auth.id))
+      localStorage.setItem('auth_token', auth.token || '')
 
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label className="form-label">Email hoặc Số điện thoại</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                name="email"
-                                placeholder="Nhập email hoặc số điện thoại"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+      navigate('/')
+    } catch (err) {
+      setError(err.message || 'Đăng nhập thất bại')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
-                        <div className="form-group">
-                            <label className="form-label">Mật khẩu</label>
-                            <input
-                                type="password"
-                                className="form-input"
-                                name="password"
-                                placeholder="Nhập mật khẩu"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
+  const formInputSx = {
+    width: '100%',
+    px: '16px',
+    py: '12px',
+    border: '1px solid #e0e0e0',
+    borderRadius: '8px',
+    fontSize: '15px',
+    transition: 'all 0.3s',
+    outline: 'none'
+  }
 
-                        <div className="form-options">
-                            <label className="remember-me">
-                                <input type="checkbox" /> Ghi nhớ đăng nhập
-                            </label>
-                            <a href="#" className="forgot-password">Quên mật khẩu?</a>
-                        </div>
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', p: '40px 20px', backgroundColor: 'var(--bg-body)' }}>
+      <Box sx={{ display: 'flex', width: { xs: '100%', md: '1000px' }, maxWidth: '100%', background: 'var(--bg-surface)', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 15px 35px rgba(0, 0, 0, 0.1)' }}>
+        {/* Left Side: Visual */}
+        <Box sx={{ flex: 1, backgroundColor: '#ffebee', display: { xs: 'none', md: 'flex' }, alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+          <Box component="img" src={bannerLogin} alt="Fashion Model" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <Box sx={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(218, 37, 29, 0.2), rgba(0, 0, 0, 0.4))', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', p: '40px', color: 'white' }}>
+            <Typography component="h2" variant="h4" sx={{ fontSize: '32px', fontWeight: 700, mb: '10px', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>5S FASHION</Typography>
+            <Typography component="p" variant="body1" sx={{ fontSize: '16px', opacity: 0.9 }}>Trải nghiệm phong cách thời trang nam đẳng cấp.</Typography>
+          </Box>
+        </Box>
 
-                        <button type="submit" className="login-btn">ĐĂNG NHẬP</button>
-                    </form>
+        {/* Right Side: Form */}
+        <Box sx={{ flex: 1, p: '50px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', marginBottom: '20px', color: 'var(--text-light)', textDecoration: 'none', fontSize: '14px' }}>
+            <HomeOutlinedIcon sx={{ fontSize: 16 }} />
+            Trang chủ
+          </Link>
+          <Typography component="h1" variant="h3" sx={{ fontSize: '28px', fontWeight: 700, color: 'var(--text-main)', mb: '8px' }}>Đăng Nhập</Typography>
+          <Typography component="p" variant="body1" sx={{ color: 'var(--text-light)', mb: '32px', fontSize: '15px' }}>Chào mừng bạn quay trở lại!</Typography>
 
-                    <div className="social-login">
-                        <p>Hoặc đăng nhập với</p>
-                        <div className="social-icons">
-                            <button className="social-icon-btn">
-                                {/* Google SVG */}
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                                    <path d="M23.49 12.275C23.49 11.49 23.415 10.73 23.3 10H12V14.51H18.47C18.18 15.99 17.25 17.21 15.81 18.11V21.09H19.62C21.85 19.04 23.49 15.96 23.49 12.275Z" fill="#4285F4" />
-                                    <path d="M12 24C15.24 24 17.965 22.935 19.965 21.09L16.155 18.11C15.065 18.84 13.68 19.31 12 19.31C8.875 19.31 6.22 17.2 5.265 14.39H1.32V17.45C3.325 21.435 7.42 24 12 24Z" fill="#34A853" />
-                                    <path d="M5.26498 14.3899C5.01498 13.6399 4.87498 12.8399 4.87498 11.9999C4.87498 11.1599 5.01498 10.3599 5.26498 9.60991V6.54991H1.31998C0.479981 8.21991 9.80554e-05 10.0599 9.80554e-05 11.9999C9.80554e-05 13.9399 0.479981 15.7799 1.31998 17.4499L5.26498 14.3899Z" fill="#FBBC05" />
-                                    <path d="M12 4.69C13.77 4.69 15.35 5.3 16.605 6.49L19.99 3.105C17.965 1.215 15.235 0 12 0C7.42 0 3.325 2.565 1.32 6.55L5.27 9.61C6.22 6.8 8.875 4.69 12 4.69Z" fill="#EA4335" />
-                                </svg>
-                            </button>
-                            <button className="social-icon-btn">
-                                {/* Facebook SVG */}
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#1877F2">
-                                    <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 23.991V15.56H7.078V12.073H10.125V9.43C10.125 6.425 11.916 4.76 14.656 4.76C15.968 4.76 17.343 4.995 17.343 4.995V7.953H15.829C14.339 7.953 13.875 8.875 13.875 9.822V12.073H17.203L16.67 15.56H13.875V23.991C19.612 23.094 24 18.1 24 12.073Z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
+          {error ? (
+            <Box style={{ color: '#dc2626', marginBottom: '12px', fontSize: '14px' }}>{error}</Box>
+          ) : null}
 
-                    <div className="register-link">
-                        Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+          <Box component="form" onSubmit={handleSubmit}>
+            <Box sx={{ mb: '24px' }}>
+              <Box component="label" sx={{ display: 'block', fontSize: '14px', fontWeight: 500, mb: '8px', color: 'var(--text-main)' }}>Email hoặc Số điện thoại</Box>
+              <InputBase
+                type="text"
+                sx={formInputSx}
+                name="email"
+                placeholder="Nhập email hoặc số điện thoại"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+            </Box>
 
-export default Login;
+            <Box sx={{ mb: '24px' }}>
+              <Box component="label" sx={{ display: 'block', fontSize: '14px', fontWeight: 500, mb: '8px', color: 'var(--text-main)' }}>Mật khẩu</Box>
+              <InputBase
+                type="password"
+                sx={formInputSx}
+                name="password"
+                placeholder="Nhập mật khẩu"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '32px', fontSize: '14px' }}>
+              <Box component="label" sx={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-light)' }}>
+                <Checkbox type="checkbox" /> Ghi nhớ đăng nhập
+              </Box>
+              <Box component="a" href="#" sx={{ color: 'var(--primary-color)', textDecoration: 'none', fontWeight: 500 }}>Quên mật khẩu?</Box>
+            </Box>
+
+            <Button type="submit" disabled={isSubmitting} sx={{ width: '100%', py: '14px', background: 'var(--primary-color)', borderRadius: '8px', color: 'var(--white)', fontWeight: 600, fontSize: '16px', boxShadow: '0 4px 12px rgba(218, 37, 29, 0.3)', '&:hover': { background: 'var(--primary-hover)', transform: 'translateY(-2px)', boxShadow: '0 6px 16px rgba(218, 37, 29, 0.4)' } }}>
+              {isSubmitting ? 'ĐANG XỬ LÝ...' : 'ĐĂNG NHẬP'}
+            </Button>
+          </Box>
+
+          <Box sx={{ mt: '32px', textAlign: 'center' }}>
+            <Typography component="p" variant="body1" sx={{ color: 'var(--text-light)', fontSize: '14px', mb: '16px' }}>Hoặc đăng nhập với</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: '16px' }}>
+              <Button sx={{ width: 48, height: 48, border: '1px solid var(--border-color)', borderRadius: '50%', minWidth: 'auto', bgcolor: 'var(--bg-surface)' }}>
+                <GoogleIcon sx={{ fontSize: 24, color: '#DB4437' }} />
+              </Button>
+              <Button sx={{ width: 48, height: 48, border: '1px solid var(--border-color)', borderRadius: '50%', minWidth: 'auto', bgcolor: 'var(--bg-surface)' }}>
+                <FacebookRoundedIcon sx={{ fontSize: 24, color: '#1877F2' }} />
+              </Button>
+            </Box>
+          </Box>
+
+          <Box sx={{ mt: '24px', textAlign: 'center', fontSize: '14px', color: 'var(--text-light)' }}>
+            Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+}
+
+export default Login

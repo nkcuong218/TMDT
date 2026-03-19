@@ -1,23 +1,22 @@
-import React from 'react';
-import ProductCard from '../ProductCard/ProductCard';
-import './ProductSection.css';
+import ProductCard from '../ProductCard/ProductCard'
+import { Box, Typography } from '@mui/material'
 
 const ProductSection = ({ title, products, link }) => {
-    return (
-        <section className="product-section">
-            <div className="container">
-                <h2 className="section-title">{title}</h2>
+  return (
+    <Box component="section" sx={{ py: '60px' }}>
+      <Box sx={{ maxWidth: '1280px', mx: 'auto', px: '16px' }}>
+        <Typography component="h2" variant="h4" sx={{ mb: '20px', fontWeight: 700 }}>{title}</Typography>
 
-                <div className="grid-products">
-                    {products.map(product => (
-                        <ProductCard key={product.id} product={product} />
-                    ))}
-                </div>
+        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4,1fr)' }, gap: '16px' }}>
+          {products.map(product => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </Box>
 
-                <a href={link || "#"} className="view-all-btn">Xem Tất Cả</a>
-            </div>
-        </section>
-    );
-};
+        <Box component="a" href={link } sx={{ backgroundColor: 'whitesmoke', display: 'block', width: 'fit-content', margin: '40px auto 0', padding: '12px 32px', borderRadius: '4px', fontWeight: 600, textTransform: 'uppercase', transition: 'all 0.3s', '&:hover': { backgroundColor: 'red', color: 'white' } }}>Xem Tất Cả</Box>
+      </Box>
+    </Box>
+  )
+}
 
-export default ProductSection;
+export default ProductSection

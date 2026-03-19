@@ -1,327 +1,525 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import Layout from '../../components/Layout/Layout';
-import './Checkout.css';
+import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
+import Layout from '../../components/Layout/Layout'
+import { createOrder, getCart, toCartItemViewModel } from '../../services/catalogApi'
+import {
+  Box,
+  Button,
+  Select,
+  MenuItem,
+  Radio,
+  InputBase,
+  Typography,
+  Paper,
+  Stack,
+  Chip,
+  Divider,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  IconButton
+} from '@mui/material'
+import LocalOfferOutlinedIcon from '@mui/icons-material/LocalOfferOutlined'
+import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined'
+import PaymentsOutlinedIcon from '@mui/icons-material/PaymentsOutlined'
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined'
+import CloseIcon from '@mui/icons-material/Close'
 
-// Import images
-import p1 from '../../assets/product1.jpg';
-import p2 from '../../assets/product2.jpg';
+const sectionCardSx = {
+  p: '24px',
+  borderRadius: '10px',
+  border: '1px solid #f0f0f0',
+  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)'
+}
+
+const sectionTitleSx = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '10px',
+  mb: '18px',
+  pb: '12px',
+  borderBottom: '1px solid #efefef',
+  fontSize: '16px',
+  fontWeight: 800,
+  textTransform: 'uppercase'
+}
+
+const numberBadgeSx = {
+  width: '24px',
+  height: '24px',
+  borderRadius: '50%',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  bgcolor: '#111827',
+  color: '#fff',
+  fontSize: '12px',
+  fontWeight: 700
+}
+
+const inputSx = {
+  width: '100%',
+  height: '42px',
+  border: '1px solid #e0e0e0',
+  borderRadius: '6px',
+  px: '12px',
+  fontSize: '14px',
+  '& input': { p: 0, height: '100%' }
+}
+
+const addressCardSx = (active) => ({
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: '12px',
+  p: '14px',
+  border: '1px solid',
+  borderColor: active ? 'var(--primary-color)' : '#e0e0e0',
+  borderRadius: '8px',
+  bgcolor: active ? '#fff8f7' : '#fff',
+  cursor: 'pointer',
+  transition: 'all .2s'
+})
+
+const paymentCardSx = (active) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  p: '14px',
+  border: '1px solid',
+  borderColor: active ? '#111827' : '#e0e0e0',
+  borderRadius: '8px',
+  bgcolor: active ? '#fafafa' : '#fff',
+  cursor: 'pointer'
+})
+
+const voucherCardSx = (active, type) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '12px',
+  p: '12px',
+  mb: '10px',
+  border: '1px solid',
+  borderColor: active ? (type === 'shipping' ? '#14b8a6' : 'var(--primary-color)') : '#e0e0e0',
+  borderLeft: '4px solid',
+  borderLeftColor: type === 'shipping' ? '#14b8a6' : 'var(--primary-color)',
+  borderRadius: '8px',
+  bgcolor: active ? (type === 'shipping' ? '#f0fdfa' : '#fff5f5') : '#fff',
+  cursor: 'pointer'
+})
 
 const Checkout = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [cartItems, setCartItems] = useState([])
+  const [loadingCart, setLoadingCart] = useState(true)
 
-    // Mock Data from Cart
-    const cartItems = [
-        {
-            id: 101,
-            title: 'Áo Khoác Gió Nam Pro-DWR 5S',
-            image: p1,
-            color: 'Xanh Rêu',
-            size: 'L',
-            price: 499000,
-            quantity: 1
-        },
-        {
-            id: 102,
-            title: 'Quần Short Kaki Nam 5S Fashion',
-            image: p2,
-            color: 'Be',
-            size: '30',
-            price: 299000,
-            quantity: 2
-        }
-    ];
+  const [savedAddresses] = useState([
+    { id: 1, name: 'Nguyễn Văn A', phone: '0901234567', address: 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', type: 'Nhà Riêng' },
+    { id: 2, name: 'Trần Thị B', phone: '0987654321', address: 'Tòa nhà Bitexco, Quận 1, TP.HCM', type: 'Văn Phòng' }
+  ])
+  const [selectedAddressId, setSelectedAddressId] = useState(1)
+  const [isNewAddress, setIsNewAddress] = useState(false)
 
-    const [savedAddresses, setSavedAddresses] = useState([
-        { id: 1, name: 'Nguyễn Văn A', phone: '0901234567', address: 'Số 1 Đại Cồ Việt, Hai Bà Trưng, Hà Nội', type: 'Nhà Riêng' },
-        { id: 2, name: 'Trần Thị B', phone: '0987654321', address: 'Tòa nhà Bitexco, Quận 1, TP.HCM', type: 'Văn Phòng' }
-    ]);
-    const [selectedAddressId, setSelectedAddressId] = useState(1);
-    const [isNewAddress, setIsNewAddress] = useState(false);
+  const [availableVouchers] = useState([
+    { id: 1, code: 'FREESHIP', amount: 30000, desc: 'Giảm tối đa 30k phí vận chuyển', type: 'shipping' },
+    { id: 2, code: '5SNEW', amount: 50000, desc: 'Giảm 50k cho đơn hàng từ 0đ', type: 'order' },
+    { id: 3, code: 'SALE10K', amount: 10000, desc: 'Giảm 10k cho mọi đơn hàng', type: 'order' }
+  ])
 
-    // Voucher Data & State
-    const [availableVouchers] = useState([
-        { id: 1, code: 'FREESHIP', amount: 30000, desc: 'Giảm tối đa 30k phí vận chuyển', type: 'shipping' },
-        { id: 2, code: '5SNEW', amount: 50000, desc: 'Giảm 50k cho đơn hàng từ 0đ', type: 'order' },
-        { id: 3, code: 'SALE10K', amount: 10000, desc: 'Giảm 10k cho mọi đơn hàng', type: 'order' }
-    ]);
+  const [showVoucherModal, setShowVoucherModal] = useState(false)
+  const [selectedShippingVoucherId, setSelectedShippingVoucherId] = useState(null)
+  const [selectedOrderVoucherId, setSelectedOrderVoucherId] = useState(null)
+  const [manualVoucherInput, setManualVoucherInput] = useState('')
 
-    const [showVoucherModal, setShowVoucherModal] = useState(false);
-    const [selectedShippingVoucherId, setSelectedShippingVoucherId] = useState(null);
-    const [selectedOrderVoucherId, setSelectedOrderVoucherId] = useState(null);
+  const [shippingDiscount, setShippingDiscount] = useState(0)
+  const [orderDiscount, setOrderDiscount] = useState(0)
 
-    const [manualVoucherInput, setManualVoucherInput] = useState('');
+  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  const shippingFee = subtotal > 500000 ? 0 : 30000
+  const total = Math.max(0, subtotal + shippingFee - shippingDiscount - orderDiscount)
 
-    // Discount Calculation
-    const [shippingDiscount, setShippingDiscount] = useState(0);
-    const [orderDiscount, setOrderDiscount] = useState(0);
+  const [formData, setFormData] = useState({
+    fullName: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    district: '',
+    ward: '',
+    note: ''
+  })
+  const [paymentMethod, setPaymentMethod] = useState('cod')
 
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const shippingFee = subtotal > 500000 ? 0 : 30000;
+  useEffect(() => {
+    const userId = localStorage.getItem('user_id')
+    if (!userId) {
+      alert('Vui long dang nhap de thanh toan.')
+      navigate('/login')
+      return
+    }
 
-    // Logic to update discounts
-    useEffect(() => {
-        // Shipping Disc logic
-        if (selectedShippingVoucherId) {
-            const v = availableVouchers.find(x => x.id === selectedShippingVoucherId);
-            // Cap at actual shipping fee
-            setShippingDiscount(v ? Math.min(v.amount, shippingFee) : 0);
-        } else {
-            setShippingDiscount(0);
-        }
+    const fetchCart = async () => {
+      try {
+        const data = await getCart(userId)
+        const items = (data?.items || []).map(toCartItemViewModel)
+        setCartItems(items)
+      } catch (err) {
+        alert(err.message || 'Khong the tai gio hang.')
+      } finally {
+        setLoadingCart(false)
+      }
+    }
 
-        // Order Disc logic
-        if (selectedOrderVoucherId) {
-            const v = availableVouchers.find(x => x.id === selectedOrderVoucherId);
-            setOrderDiscount(v ? v.amount : 0);
-        } else {
-            setOrderDiscount(0);
-        }
-    }, [selectedShippingVoucherId, selectedOrderVoucherId, shippingFee, availableVouchers]);
+    fetchCart()
+  }, [navigate])
 
-    const total = Math.max(0, subtotal + shippingFee - shippingDiscount - orderDiscount);
+  useEffect(() => {
+    if (selectedShippingVoucherId) {
+      const voucher = availableVouchers.find((x) => x.id === selectedShippingVoucherId)
+      setShippingDiscount(voucher ? Math.min(voucher.amount, shippingFee) : 0)
+    } else {
+      setShippingDiscount(0)
+    }
 
-    // Helpers
-    const handleApplyManual = () => {
-        // Mock check manual
-        alert(`Tính năng nhập mã thủ công: ${manualVoucherInput} (Chưa implement logic check thực tế)`);
-    };
+    if (selectedOrderVoucherId) {
+      const voucher = availableVouchers.find((x) => x.id === selectedOrderVoucherId)
+      setOrderDiscount(voucher ? voucher.amount : 0)
+    } else {
+      setOrderDiscount(0)
+    }
+  }, [selectedShippingVoucherId, selectedOrderVoucherId, shippingFee, availableVouchers])
 
-    const toggleShippingVoucher = (id) => {
-        if (selectedShippingVoucherId === id) setSelectedShippingVoucherId(null);
-        else setSelectedShippingVoucherId(id);
-    };
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
-    const toggleOrderVoucher = (id) => {
-        if (selectedOrderVoucherId === id) setSelectedOrderVoucherId(null);
-        else setSelectedOrderVoucherId(id);
-    };
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
 
-    const [formData, setFormData] = useState({
-        fullName: '', phone: '', email: '', address: '', city: '', district: '', ward: '', note: ''
-    });
+  const handleApplyManual = () => {
+    alert(`Tính năng nhập mã thủ công: ${manualVoucherInput} (Chưa implement logic check thực tế)`)
+  }
 
-    const [paymentMethod, setPaymentMethod] = useState('cod');
+  const toggleShippingVoucher = (id) => {
+    if (selectedShippingVoucherId === id) setSelectedShippingVoucherId(null)
+    else setSelectedShippingVoucherId(id)
+  }
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  const toggleOrderVoucher = (id) => {
+    if (selectedOrderVoucherId === id) setSelectedOrderVoucherId(null)
+    else setSelectedOrderVoucherId(id)
+  }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+  const getVoucherLabel = () => {
+    let count = 0
+    if (selectedShippingVoucherId) count++
+    if (selectedOrderVoucherId) count++
+    if (count === 0) return 'Chọn hoặc nhập mã'
+    return `Đã chọn ${count} mã ưu đãi`
+  }
 
-        // Final Data Construction
-        let finalAddress = isNewAddress ? { ...formData } : savedAddresses.find(a => a.id === selectedAddressId);
+  const handleSubmit = async (e) => {
+    e.preventDefault()
 
-        console.log('Order Placed:', {
-            address: finalAddress,
-            items: cartItems,
-            payment: paymentMethod,
-            vouchers: {
-                shipping: selectedShippingVoucherId,
-                order: selectedOrderVoucherId
-            },
-            total: total
-        });
+    if (cartItems.length === 0) {
+      alert('Gio hang dang trong.')
+      return
+    }
 
-        alert('Đặt hàng thành công!');
-        navigate('/');
-    };
+    const userId = Number(localStorage.getItem('user_id'))
+    if (!userId) {
+      alert('Vui long dang nhap de thanh toan.')
+      navigate('/login')
+      return
+    }
 
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
+    const finalAddress = isNewAddress
+      ? { name: formData.fullName, phone: formData.phone, address: formData.address }
+      : savedAddresses.find((a) => a.id === selectedAddressId)
 
-    // Derived Label for Voucher Bar
-    const getVoucherLabel = () => {
-        let count = 0;
-        if (selectedShippingVoucherId) count++;
-        if (selectedOrderVoucherId) count++;
+    if (!finalAddress?.name || !finalAddress?.phone || !finalAddress?.address) {
+      alert('Vui long dien day du thong tin nguoi nhan.')
+      return
+    }
 
-        if (count === 0) return 'Chọn hoặc nhập mã';
-        return `Đã chọn ${count} mã ưu đãi`;
-    };
+    try {
+      const selectedOrderVoucher = availableVouchers.find((x) => x.id === selectedOrderVoucherId)
+      const selectedShippingVoucher = availableVouchers.find((x) => x.id === selectedShippingVoucherId)
+      const voucherCode = selectedOrderVoucher?.code || selectedShippingVoucher?.code || null
 
-    return (
-        <Layout>
-            <div className="checkout-page">
-                <form className="checkout-container" onSubmit={handleSubmit}>
+      let streetAddress = formData.address || ''
+      let district = formData.district || ''
+      let city = formData.city || ''
 
-                    {/* Left Column */}
-                    <div className="checkout-info">
+      if (!isNewAddress && finalAddress?.address) {
+        const parts = String(finalAddress.address).split(',').map((x) => x.trim()).filter(Boolean)
+        streetAddress = parts[0] || finalAddress.address
+        district = parts[1] || district
+        city = parts[2] || city
+      }
 
-                        {/* Address Section */}
-                        <div className="checkout-section">
-                            <div className="section-title"><span>1</span> ĐỊA CHỈ NHẬN HÀNG</div>
-                            <div className="address-list">
-                                {savedAddresses.map(addr => (
-                                    <label key={addr.id} className={`address-card ${selectedAddressId === addr.id ? 'active' : ''}`}>
-                                        <div className="address-radio">
-                                            <input type="radio" name="addr_sel" checked={selectedAddressId === addr.id} onChange={() => { setSelectedAddressId(addr.id); setIsNewAddress(false); }} />
-                                        </div>
-                                        <div className="address-content">
-                                            <div className="addr-header">
-                                                <span className="addr-name">{addr.name}</span>
-                                                <span className="addr-phone">{addr.phone}</span>
-                                                {addr.type && <span className="addr-tag">{addr.type}</span>}
-                                            </div>
-                                            <div className="addr-text">{addr.address}</div>
-                                        </div>
-                                    </label>
-                                ))}
-                                <label className={`address-card ${isNewAddress ? 'active' : ''}`}>
-                                    <div className="address-radio">
-                                        <input type="radio" name="addr_sel" checked={isNewAddress} onChange={() => { setSelectedAddressId(null); setIsNewAddress(true); }} />
-                                    </div>
-                                    <div className="address-content"><b>Sử dụng địa chỉ khác</b></div>
-                                </label>
-                            </div>
-                            {isNewAddress && (
-                                <div className="form-grid" style={{ marginTop: '20px', borderTop: '1px solid #eee', paddingTop: '20px' }}>
-                                    <div className="form-group"><label>Họ tên *</label><input className="form-input" name="fullName" required onChange={handleChange} /></div>
-                                    <div className="form-group"><label>SĐT *</label><input className="form-input" name="phone" required onChange={handleChange} /></div>
-                                    <div className="form-group full"><label>Địa chỉ *</label><input className="form-input" name="address" required onChange={handleChange} /></div>
-                                    <div className="form-group"><label>Tỉnh/Thành</label><select className="form-input" name="city" required onChange={handleChange}><option>Hà Nội</option></select></div>
-                                    <div className="form-group"><label>Quận/Huyện</label><select className="form-input" name="district" required onChange={handleChange}><option>Quận 1</option></select></div>
-                                </div>
-                            )}
-                        </div>
+      const payload = {
+        userId,
+        fullName: finalAddress.name,
+        phone: finalAddress.phone,
+        streetAddress,
+        district,
+        city,
+        address: finalAddress.address,
+        note: formData.note || '',
+        paymentMethod: paymentMethod.toUpperCase(),
+        shippingFee,
+        voucherCode,
+        discountAmount: shippingDiscount + orderDiscount,
+        saveAsDefaultAddress: isNewAddress
+      }
 
-                        {/* Voucher Section */}
-                        <div className="checkout-section">
-                            <div className="section-title"><span>2</span> MÃ ƯU ĐÃI / VOUCHER</div>
+      const response = await createOrder(payload)
+      alert(`Dat hang thanh cong! Ma don: ${response.code}`)
+      navigate('/')
+    } catch (err) {
+      alert(err.message || 'Dat hang that bai.')
+    }
+  }
 
-                            {/* Part 1: Input */}
-                            <div className="voucher-group">
-                                <input
-                                    className="form-input"
-                                    placeholder="Nhập mã voucher"
-                                    value={manualVoucherInput}
-                                    onChange={(e) => setManualVoucherInput(e.target.value)}
-                                />
-                                <button type="button" className="voucher-btn" onClick={handleApplyManual}>ÁP DỤNG</button>
-                            </div>
+  return (
+    <Layout>
+      <Box sx={{ bgcolor: '#f8f9fa', minHeight: '90vh', py: { xs: '20px', md: '40px' } }}>
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{
+            maxWidth: '1200px',
+            mx: 'auto',
+            px: '16px',
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: '2fr 1fr' },
+            gap: '24px'
+          }}
+        >
+          <Stack spacing={2.5}>
+            <Paper sx={sectionCardSx}>
+              <Box sx={sectionTitleSx}>
+                <Box sx={numberBadgeSx}>1</Box>
+                <LocationOnOutlinedIcon sx={{ color: 'var(--primary-color)' }} />
+                <Box component="span">Địa chỉ nhận hàng</Box>
+              </Box>
 
-                            {/* Part 2: Select Bar */}
-                            <div className="voucher-selector-bar" onClick={() => setShowVoucherModal(true)}>
-                                <div className="vs-label">
-                                    <svg className="vs-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M2 9h20v6h-20v-6zm18-2H4V5h16v2zm-16 10h16v2H4v-2z" opacity=".3"></path><path d="M20 7h-1V5c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM7 5h10v2H7V5zM4 19V9h16v10H4z"></path></svg>
-                                    <span>Chọn Voucher</span>
-                                </div>
-                                <div className="vs-value">{getVoucherLabel()} &gt;</div>
-                            </div>
-                        </div>
+              <Stack spacing={1.5}>
+                {savedAddresses.map((addr) => (
+                  <Box
+                    key={addr.id}
+                    component="label"
+                    sx={addressCardSx(selectedAddressId === addr.id && !isNewAddress)}
+                  >
+                    <Radio
+                      checked={selectedAddressId === addr.id && !isNewAddress}
+                      onChange={() => {
+                        setSelectedAddressId(addr.id)
+                        setIsNewAddress(false)
+                      }}
+                    />
+                    <Box sx={{ flex: 1 }}>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', mb: '4px' }}>
+                        <Typography sx={{ fontWeight: 700 }}>{addr.name}</Typography>
+                        <Typography sx={{ color: '#666' }}>{addr.phone}</Typography>
+                        {addr.type && <Chip size="small" label={addr.type} />}
+                      </Box>
+                      <Typography sx={{ color: '#555', fontSize: '14px' }}>{addr.address}</Typography>
+                    </Box>
+                  </Box>
+                ))}
 
-                        {/* Payment Section */}
-                        <div className="checkout-section">
-                            <div className="section-title"><span>3</span> PHƯƠNG THỨC THANH TOÁN</div>
-                            <div className="payment-options">
-                                <label className={`payment-option ${paymentMethod === 'cod' ? 'active' : ''}`}>
-                                    <input type="radio" name="pay" className="payment-radio" checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
-                                    <div className="payment-label">Thanh toán khi nhận hàng (COD)</div>
-                                </label>
-                                <label className={`payment-option ${paymentMethod === 'banking' ? 'active' : ''}`}>
-                                    <input type="radio" name="pay" className="payment-radio" checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} />
-                                    <div className="payment-label">Chuyển khoản ngân hàng</div>
-                                </label>
-                                <label className={`payment-option ${paymentMethod === 'momo' ? 'active' : ''}`}>
-                                    <input type="radio" name="pay" className="payment-radio" checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} />
-                                    <div className="payment-label">Ví MoMo</div>
-                                </label>
-                            </div>
-                        </div>
+                <Box component="label" sx={addressCardSx(isNewAddress)}>
+                  <Radio
+                    checked={isNewAddress}
+                    onChange={() => {
+                      setSelectedAddressId(null)
+                      setIsNewAddress(true)
+                    }}
+                  />
+                  <Typography sx={{ fontWeight: 700 }}>Sử dụng địa chỉ khác</Typography>
+                </Box>
+              </Stack>
 
-                    </div>
+              {isNewAddress && (
+                <Box sx={{ mt: 2.5, pt: 2.5, borderTop: '1px solid #eee' }}>
+                  <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: '16px' }}>
+                    <Box>
+                      <Typography sx={{ mb: '6px', fontSize: '13px', fontWeight: 600 }}>Họ tên *</Typography>
+                      <InputBase name="fullName" required sx={inputSx} onChange={handleChange} />
+                    </Box>
+                    <Box>
+                      <Typography sx={{ mb: '6px', fontSize: '13px', fontWeight: 600 }}>SĐT *</Typography>
+                      <InputBase name="phone" required sx={inputSx} onChange={handleChange} />
+                    </Box>
+                    <Box sx={{ gridColumn: { xs: 'auto', md: '1 / -1' } }}>
+                      <Typography sx={{ mb: '6px', fontSize: '13px', fontWeight: 600 }}>Địa chỉ *</Typography>
+                      <InputBase name="address" required sx={inputSx} onChange={handleChange} />
+                    </Box>
+                    <Box>
+                      <Typography sx={{ mb: '6px', fontSize: '13px', fontWeight: 600 }}>Tỉnh/Thành</Typography>
+                      <Select name="city" required sx={inputSx} onChange={handleChange} defaultValue="">
+                        <MenuItem value="">Chọn tỉnh/thành</MenuItem>
+                        <MenuItem value="Hà Nội">Hà Nội</MenuItem>
+                        <MenuItem value="TP.HCM">TP.HCM</MenuItem>
+                      </Select>
+                    </Box>
+                    <Box>
+                      <Typography sx={{ mb: '6px', fontSize: '13px', fontWeight: 600 }}>Quận/Huyện</Typography>
+                      <Select name="district" required sx={inputSx} onChange={handleChange} defaultValue="">
+                        <MenuItem value="">Chọn quận/huyện</MenuItem>
+                        <MenuItem value="Quận 1">Quận 1</MenuItem>
+                        <MenuItem value="Hai Bà Trưng">Hai Bà Trưng</MenuItem>
+                      </Select>
+                    </Box>
+                  </Box>
+                </Box>
+              )}
+            </Paper>
 
-                    {/* Right Column: Summary */}
-                    <div className="checkout-summary">
-                        <div className="checkout-section">
-                            <div className="section-title">ĐƠN HÀNG ({cartItems.length})</div>
-                            <div className="order-items">
-                                {cartItems.map(item => (
-                                    <div key={item.id} className="order-item">
-                                        <div className="oi-image"><img src={item.image} alt="" /></div>
-                                        <div className="oi-details">
-                                            <div className="oi-name">{item.title}</div>
-                                            <div className="oi-meta">{item.color} | {item.size} | x{item.quantity}</div>
-                                            <div className="oi-price">{(item.price * item.quantity).toLocaleString()}đ</div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="summary-row"><span>Tạm tính</span><b>{subtotal.toLocaleString()}đ</b></div>
-                            <div className="summary-row"><span>Phí vận chuyển</span><b>{shippingFee.toLocaleString()}đ</b></div>
+            <Paper sx={sectionCardSx}>
+              <Box sx={sectionTitleSx}>
+                <Box sx={numberBadgeSx}>2</Box>
+                <LocalOfferOutlinedIcon sx={{ color: 'var(--primary-color)' }} />
+                <Box component="span">Mã ưu đãi / Voucher</Box>
+              </Box>
 
-                            {/* Discount Rows */}
-                            {shippingDiscount > 0 && (
-                                <div className="summary-row" style={{ color: 'var(--shipping-color)' }}>
-                                    <span>Giảm phí vận chuyển</span>
-                                    <b>-{shippingDiscount.toLocaleString()}đ</b>
-                                </div>
-                            )}
-                            {orderDiscount > 0 && (
-                                <div className="summary-row" style={{ color: 'var(--primary-color)' }}>
-                                    <span>Voucher giảm giá</span>
-                                    <b>-{orderDiscount.toLocaleString()}đ</b>
-                                </div>
-                            )}
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mb: 2 }}>
+                <InputBase
+                  sx={inputSx}
+                  placeholder="Nhập mã voucher"
+                  value={manualVoucherInput}
+                  onChange={(e) => setManualVoucherInput(e.target.value)}
+                />
+                <Button type="button" onClick={handleApplyManual} sx={{ px: '20px', bgcolor: 'var(--primary-color)', color: '#fff', '&:hover': { bgcolor: '#c62828' } }}>
+                  Áp dụng
+                </Button>
+              </Stack>
 
-                            <div className="summary-row total"><span>Tổng cộng</span><span>{total.toLocaleString()}đ</span></div>
-                            <button className="place-order-btn">ĐẶT HÀNG</button>
-                        </div>
-                    </div>
+              <Button
+                type="button"
+                onClick={() => setShowVoucherModal(true)}
+                variant="outlined"
+                sx={{
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-main)',
+                  py: '10px',
+                  '&:hover': { borderColor: 'var(--text-light)', bgcolor: 'var(--bg-muted)' }
+                }}
+              >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <LocalOfferOutlinedIcon sx={{ color: 'var(--primary-color)' }} />
+                  <Box component="span">Chọn Voucher</Box>
+                </Box>
+                <Typography sx={{ color: 'var(--primary-color)', fontWeight: 600 }}>{getVoucherLabel()}</Typography>
+              </Button>
+            </Paper>
 
-                    {/* Voucher Modal */}
-                    {showVoucherModal && (
-                        <div className="modal-overlay" onClick={() => setShowVoucherModal(false)}>
-                            <div className="modal-content" onClick={e => e.stopPropagation()}>
-                                <div className="modal-header">
-                                    <span>Chọn 5S Fashion Voucher</span>
-                                    <span className="modal-close" onClick={() => setShowVoucherModal(false)}>&times;</span>
-                                </div>
-                                <div className="modal-body">
+            <Paper sx={sectionCardSx}>
+              <Box sx={sectionTitleSx}>
+                <Box sx={numberBadgeSx}>3</Box>
+                <PaymentsOutlinedIcon sx={{ color: 'var(--primary-color)' }} />
+                <Box component="span">Phương thức thanh toán</Box>
+              </Box>
 
-                                    <div className="voucher-section-title">Mã Miễn Phí Vận Chuyển</div>
-                                    {availableVouchers.filter(v => v.type === 'shipping').map(v => (
-                                        <label key={v.id} className={`voucher-card type-shipping ${selectedShippingVoucherId === v.id ? 'active' : ''}`}
-                                            onClick={(e) => { e.preventDefault(); toggleShippingVoucher(v.id); }}
-                                        >
-                                            <input type="radio" className="voucher-radio" checked={selectedShippingVoucherId === v.id} readOnly />
-                                            <div className="voucher-info">
-                                                <div className="voucher-code">{v.code}</div>
-                                                <div className="voucher-desc">{v.desc}</div>
-                                            </div>
-                                            <div className="voucher-amount">-{v.amount.toLocaleString()}đ</div>
-                                        </label>
-                                    ))}
+              <Stack spacing={1.5}>
+                <Box component="label" sx={paymentCardSx(paymentMethod === 'cod')}>
+                  <Radio checked={paymentMethod === 'cod'} onChange={() => setPaymentMethod('cod')} />
+                  <Typography sx={{ fontWeight: 600 }}>Thanh toán khi nhận hàng (COD)</Typography>
+                </Box>
+                <Box component="label" sx={paymentCardSx(paymentMethod === 'banking')}>
+                  <Radio checked={paymentMethod === 'banking'} onChange={() => setPaymentMethod('banking')} />
+                  <Typography sx={{ fontWeight: 600 }}>Chuyển khoản ngân hàng</Typography>
+                </Box>
+                <Box component="label" sx={paymentCardSx(paymentMethod === 'momo')}>
+                  <Radio checked={paymentMethod === 'momo'} onChange={() => setPaymentMethod('momo')} />
+                  <Typography sx={{ fontWeight: 600 }}>Ví MoMo</Typography>
+                </Box>
+              </Stack>
+            </Paper>
+          </Stack>
 
-                                    <div className="voucher-section-title">Mã Giảm Giá / Hoàn Xu</div>
-                                    {availableVouchers.filter(v => v.type === 'order').map(v => (
-                                        <label key={v.id} className={`voucher-card type-order ${selectedOrderVoucherId === v.id ? 'active' : ''}`}
-                                            onClick={(e) => { e.preventDefault(); toggleOrderVoucher(v.id); }}
-                                        >
-                                            <input type="radio" className="voucher-radio" checked={selectedOrderVoucherId === v.id} readOnly />
-                                            <div className="voucher-info">
-                                                <div className="voucher-code">{v.code}</div>
-                                                <div className="voucher-desc">{v.desc}</div>
-                                            </div>
-                                            <div className="voucher-amount">-{v.amount.toLocaleString()}đ</div>
-                                        </label>
-                                    ))}
+          <Paper sx={{ ...sectionCardSx, height: 'fit-content', position: { xs: 'static', lg: 'sticky' }, top: { lg: '90px' } }}>
+            <Box sx={{ ...sectionTitleSx, mb: '14px' }}>
+              <ReceiptLongOutlinedIcon sx={{ color: 'var(--primary-color)' }} />
+              <Box component="span">Đơn hàng ({cartItems.length})</Box>
+            </Box>
 
-                                </div>
-                                <div className="modal-footer">
-                                    <button type="button" className="btn-secondary" onClick={() => setShowVoucherModal(false)}>HUỶ</button>
-                                    <button type="button" className="btn-primary" onClick={() => setShowVoucherModal(false)}>ĐỒNG Ý</button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+            {loadingCart && <Typography>Dang tai gio hang...</Typography>}
 
-                </form>
-            </div>
-        </Layout>
-    );
-};
+            <Box sx={{ maxHeight: '360px', overflowY: 'auto', mb: 2 }}>
+              {cartItems.map((item) => (
+                <Box key={item.id} sx={{ display: 'flex', gap: '12px', pb: '12px', mb: '12px', borderBottom: '1px dashed #e5e7eb' }}>
+                  <Box component="img" src={item.image} alt="" sx={{ width: '60px', height: '75px', objectFit: 'cover', borderRadius: '4px' }} />
+                  <Box sx={{ flex: 1 }}>
+                    <Typography sx={{ fontSize: '13px', fontWeight: 700, mb: '4px' }}>{item.title}</Typography>
+                    <Typography sx={{ fontSize: '12px', color: '#888' }}>{item.color} | {item.size} | x{item.quantity}</Typography>
+                    <Typography sx={{ fontSize: '13px', fontWeight: 700, mt: '4px' }}>{(item.price * item.quantity).toLocaleString()}đ</Typography>
+                  </Box>
+                </Box>
+              ))}
+            </Box>
 
-export default Checkout;
+            <Stack spacing={1}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><Typography>Tạm tính</Typography><Typography fontWeight={700}>{subtotal.toLocaleString()}đ</Typography></Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}><Typography>Phí vận chuyển</Typography><Typography fontWeight={700}>{shippingFee.toLocaleString()}đ</Typography></Box>
+              {shippingDiscount > 0 && <Box sx={{ display: 'flex', justifyContent: 'space-between', color: '#14b8a6' }}><Typography>Giảm phí vận chuyển</Typography><Typography fontWeight={700}>-{shippingDiscount.toLocaleString()}đ</Typography></Box>}
+              {orderDiscount > 0 && <Box sx={{ display: 'flex', justifyContent: 'space-between', color: 'var(--primary-color)' }}><Typography>Voucher giảm giá</Typography><Typography fontWeight={700}>-{orderDiscount.toLocaleString()}đ</Typography></Box>}
+              <Divider sx={{ my: 1.5, borderStyle: 'dashed' }} />
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                <Typography sx={{ fontWeight: 800, fontSize: '16px' }}>Tổng cộng</Typography>
+                <Typography sx={{ fontWeight: 800, fontSize: '22px', color: 'var(--primary-color)' }}>{total.toLocaleString()}đ</Typography>
+              </Box>
+            </Stack>
+
+            <Button type="submit" sx={{ mt: 2.5, width: '100%', height: '50px', bgcolor: 'var(--primary-color)', color: '#fff', fontSize: '16px', fontWeight: 800, '&:hover': { bgcolor: '#c62828' } }}>
+              ĐẶT HÀNG
+            </Button>
+          </Paper>
+        </Box>
+
+        <Dialog open={showVoucherModal} onClose={() => setShowVoucherModal(false)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            Chọn 5S Fashion Voucher
+            <IconButton onClick={() => setShowVoucherModal(false)}><CloseIcon /></IconButton>
+          </DialogTitle>
+          <DialogContent dividers sx={{ bgcolor: '#f8f9fa' }}>
+            <Typography sx={{ fontSize: '13px', color: '#666', mb: 1 }}>Mã Miễn Phí Vận Chuyển</Typography>
+            {availableVouchers.filter((v) => v.type === 'shipping').map((v) => (
+              <Box key={v.id} sx={voucherCardSx(selectedShippingVoucherId === v.id, 'shipping')} onClick={() => toggleShippingVoucher(v.id)}>
+                <Radio checked={selectedShippingVoucherId === v.id} readOnly />
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: '14px' }}>{v.code}</Typography>
+                  <Typography sx={{ fontSize: '12px', color: '#666' }}>{v.desc}</Typography>
+                </Box>
+                <Typography sx={{ fontWeight: 700, color: '#14b8a6' }}>-{v.amount.toLocaleString()}đ</Typography>
+              </Box>
+            ))}
+
+            <Typography sx={{ fontSize: '13px', color: '#666', mb: 1, mt: 2 }}>Mã Giảm Giá / Hoàn Xu</Typography>
+            {availableVouchers.filter((v) => v.type === 'order').map((v) => (
+              <Box key={v.id} sx={voucherCardSx(selectedOrderVoucherId === v.id, 'order')} onClick={() => toggleOrderVoucher(v.id)}>
+                <Radio checked={selectedOrderVoucherId === v.id} readOnly />
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: '14px' }}>{v.code}</Typography>
+                  <Typography sx={{ fontSize: '12px', color: '#666' }}>{v.desc}</Typography>
+                </Box>
+                <Typography sx={{ fontWeight: 700, color: 'var(--primary-color)' }}>-{v.amount.toLocaleString()}đ</Typography>
+              </Box>
+            ))}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowVoucherModal(false)} variant="outlined">HUỶ</Button>
+            <Button onClick={() => setShowVoucherModal(false)} variant="contained" sx={{ bgcolor: 'var(--primary-color)' }}>ĐỒNG Ý</Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </Layout>
+  )
+}
+
+export default Checkout

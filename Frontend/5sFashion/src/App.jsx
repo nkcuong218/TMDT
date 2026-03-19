@@ -1,11 +1,8 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home/Home';
-import Login from './pages/Login/Login'; // Kept Login import as it's used in a route
+import Login from './pages/Login/Login';
 import Register from './pages/Register/Register';
-// import Account from './pages/Account/Account'; // Temporarily disabled
-import ProductList from './pages/ProductList/ProductList';
+import Account from './pages/Account/Account';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
 import ProductDetail from './pages/ProductDetail/ProductDetail';
 import Cart from './pages/Cart/Cart';
@@ -21,27 +18,34 @@ import WarehouseManager from './pages/Admin/Warehouse/WarehouseManager';
 import WarehouseHistory from './pages/Admin/Warehouse/WarehouseHistory';
 import WarehouseInvoice from './pages/Admin/Warehouse/WarehouseInvoice';
 import WarehouseImport from './pages/Admin/Warehouse/WarehouseImport';
+import Settings from './pages/Settings/Settings';
+
+const __inlineStyles_app = `
+/* App specific styles if needed */
+`;
+
+if (typeof document !== 'undefined' && !document.getElementById('app-styles')) {
+  const styleEl = document.createElement('style');
+  styleEl.id = 'app-styles';
+  styleEl.textContent = __inlineStyles_app;
+  document.head.appendChild(styleEl);
+}
+
 
 function App() {
-  // DEV: Force Admin Role for testing
-  React.useEffect(() => {
-    localStorage.setItem('user_role', 'admin');
-    localStorage.setItem('isLoggedIn', 'true');
-  }, []);
-
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* Add more routes here */}
-        {/* <Route path="/account" element={<Account />} /> */}
-        <Route path="/products" element={<ProductList />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/products" element={<Navigate to="/" replace />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
+        <Route path="/settings" element={<Settings />} />
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminDashboard />} />
