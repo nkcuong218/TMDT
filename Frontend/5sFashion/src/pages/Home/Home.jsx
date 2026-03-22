@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Layout from '../../components/Layout/Layout'
 import Hero from '../../components/Hero/Hero'
 import ProductSection from '../../components/ProductSection/ProductSection'
+import ProductCarousel from '../../components/ProductCarousel/ProductCarousel'
 import PolicySection from '../../components/PolicySection/PolicySection'
 import { getProducts } from '../../services/catalogApi'
 import { Box } from '@mui/material'
@@ -70,12 +71,12 @@ const Home = () => {
         />
       )}
 
-      {bestSellers.length > 0 && (
-        <ProductSection
-          title="Bán Chạy Nhất"
-          products={bestSellers}
-        />
-      )}
+      <ProductCarousel 
+        tabs={[
+          { label: 'Bán chạy nhất', products: bestSellers },
+          { label: 'Giảm giá nhiều nhất', products: newArrivals.filter(p => p.discount > 0) }
+        ]} 
+      />
     </Layout>
   )
 }

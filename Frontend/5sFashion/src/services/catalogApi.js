@@ -176,7 +176,22 @@ export const getCategories = async () => {
   return categories || []
 }
 
-export const getCategoryBySlug = (slug) => apiRequest(`/categories/slug/${slug}`)
+export const getCategoryBySlug = async (slug) => {
+  try {
+    // Ưu tiên gọi API trực tiếp nếu BE đã viết hàm này
+    return await apiRequest(`/categories/slug/${slug}`);
+  } catch (error) {
+    // Fallback: Nếu BE báo lỗi 404 (chưa viết API slug), FE sẽ gọi API lấy toàn bộ 
+    // danh mục và tự nhặt ra cái khớp dể chữa cháy.
+    const allCategories = await getCategories();
+    const found = allCategories.find(c => 
+      c.slug === slug || 
+      (c.name && c.name.toLowerCase().replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a').replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e').replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i').replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o').replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u').replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y').replace(/đ/gi, 'd').replace(/\s+/g, '-') === slug)
+    );
+    if (!found) throw new Error('Không tìm thấy danh mục!');
+    return found;
+  }
+}
 
 export const getProducts = async ({ page = 0, size = 20, activeOnly = true } = {}) => {
   const [list, categoryMap] = await Promise.all([
@@ -416,7 +431,8 @@ export const loginUser = async ({ identifier, password }) => {
   return {
     id: auth.id,
     role: String(auth.role || 'CUSTOMER').toLowerCase(),
-    token: auth.token || ''
+    token: auth.token || auth.accessToken || auth.jwt || auth.jwtToken || '',
+    name: auth.fullName || auth.name || ''
   }
 }
 

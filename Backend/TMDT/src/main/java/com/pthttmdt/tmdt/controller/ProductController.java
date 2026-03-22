@@ -29,27 +29,27 @@ public class ProductController {
         return productService.getAllActive().stream().map(productMapper::toDto).toList();
     }
 
-        @GetMapping("/category/{categoryId}")
-        public List<ProductDto> getByCategory(
-            @PathVariable Long categoryId,
-            @RequestParam(defaultValue = "false") boolean activeOnly
-        ) {
-        return productService.getByCategoryId(categoryId, activeOnly)
-            .stream()
-            .map(productMapper::toDto)
-            .toList();
-        }
+    @GetMapping("/category/{categoryId}")
+    public List<ProductDto> getByCategory(
+        @PathVariable Long categoryId,
+        @RequestParam(defaultValue = "false") boolean activeOnly
+    ) {
+    return productService.getByCategoryId(categoryId, activeOnly)
+        .stream()
+        .map(productMapper::toDto)
+        .toList();
+    }
 
-        @GetMapping("/search")
-        public List<ProductDto> search(
-            @RequestParam(required = false) String q,
-            @RequestParam(defaultValue = "false") boolean activeOnly
-        ) {
-        return productService.search(q, activeOnly)
-            .stream()
-            .map(productMapper::toDto)
-            .toList();
-        }
+    @GetMapping("/search")
+    public List<ProductDto> search(
+        @RequestParam(required = false) String q,
+        @RequestParam(defaultValue = "false") boolean activeOnly
+    ) {
+    return productService.search(q, activeOnly)
+        .stream()
+        .map(productMapper::toDto)
+        .toList();
+    }
 
     @GetMapping("/{id}")
     public ProductDto getById(@PathVariable Long id) {

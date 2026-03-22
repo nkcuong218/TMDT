@@ -63,7 +63,7 @@ const Cart = () => {
     <Layout>
       <Box sx={{ backgroundColor: 'var(--bg-body)', padding: '40px 0', minHeight: '80vh' }}>
         <Box className="container">
-          <Typography component="h1" variant="h3" sx={{ fontSize: '24px', fontWeight: 700, mb: '25px', textTransform: 'uppercase' }}>Giá» HÃng Cá»§a Báº¡n ({cartItems.length} sáº£n pháº©m)</Typography>
+          <Typography component="h1" variant="h3" sx={{ fontSize: '24px', fontWeight: 700, mb: '25px', textTransform: 'uppercase' }}>Giỏ hàng của bạn ({cartItems.length} sản phẩm )</Typography>
 
           {error && <Typography component="p" variant="body1" style={{ color: 'red', marginBottom: '12px' }}>{error}</Typography>}
           {loading && <Typography component="p" variant="body1">Dang tai gio hang...</Typography>}
