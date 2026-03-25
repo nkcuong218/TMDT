@@ -36,6 +36,7 @@ const Login = () => {
       localStorage.setItem('user_role', auth.role || 'customer')
       localStorage.setItem('user_id', String(auth.id))
       localStorage.setItem('auth_token', auth.token || '')
+      localStorage.setItem('user_name', auth.name || '')
 
       navigate('/')
     } catch (err) {

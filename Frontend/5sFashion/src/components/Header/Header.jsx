@@ -1,5 +1,6 @@
-﻿import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { getCart } from '../../services/catalogApi'
 import logo from '../../assets/logo-5s.png'
 import megaMenuBanner from '../../assets/Herobanner1.jpg'
 import megaMenuBanner2 from '../../assets/Herobanner2.jpg'
@@ -36,7 +37,7 @@ const megaMenuSx = {
   top: '100%',
   left: 0,
   width: '100%',
-  backgroundColor: 'var(--bg-surface)',
+  backgroundColor: 'var(--white)',
   borderTop: '1px solid var(--border-color)',
   boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
   padding: '30px 0',
@@ -104,19 +105,47 @@ if (typeof document !== 'undefined' && !document.getElementById('header-megamenu
 const Header = () => {
   const navigate = useNavigate()
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('isLoggedIn') === 'true')
-  const [showDropdown, setShowDropdown] = useState(false)
 
-  const user = { name: 'Nguyễn Văn A' }
+  const userName = localStorage.getItem('user_name') || 'Bạn' // Default fallback nếu chưa có dữ liệu
+
+  const user = { name: userName }
+
+  const [cartCount, setCartCount] = useState(0)
+
+  useEffect(() => {
+    const fetchCart = () => {
+      if (isLoggedIn) {
+        getCart()
+          .then(data => {
+            if (data && data.items) {
+               const totalQuantity = data.items.reduce((sum, item) => sum + Number(item.quantity || 1), 0)
+               setCartCount(totalQuantity)
+            }
+          })
+          .catch(err => {
+            console.error("Lỗi lấy giỏ hàng", err)
+            setCartCount(0)
+          })
+      } else {
+        setCartCount(0)
+      }
+    }
+    
+    fetchCart()
+    
+    // Event listener để update số lượng từ component khác (khi thêm vào giỏ)
+    window.addEventListener('cartUpdated', fetchCart)
+    return () => window.removeEventListener('cartUpdated', fetchCart)
+  }, [isLoggedIn])
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn')
+    localStorage.removeItem('user_role')
+    localStorage.removeItem('user_id')
+    localStorage.removeItem('auth_token')
+    localStorage.removeItem('user_name')
     setIsLoggedIn(false)
-    setShowDropdown(false)
     navigate('/')
-  }
-
-  const toggleDropdown = () => {
-    setShowDropdown(!showDropdown)
   }
 
   return (
@@ -387,16 +416,15 @@ const Header = () => {
 
         {/* Header Actions */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', background: 'var(--bg-surface)', border: '1px solid var(--border-color)', padding: '8px 16px', borderRadius: '20px', width: '240px', color: 'var(--text-main)' }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', background: 'var(--white)', border: '1px solid var(--border-color)', padding: '8px 16px', borderRadius: '20px', width: '240px', color: 'var(--text-main)' }}>
             <SearchOutlinedIcon sx={{ width: 18, height: 18 }} />
             <InputBase type="text" placeholder="Bạn tìm gì..." sx={{ border: 'none', background: 'transparent', outline: 'none', ml: '8px', width: '100%', fontSize: '14px' }} />
           </Box>
 
           {/* User Icon */}
-          <Box sx={{ position: 'relative' }}>
+          <Box sx={{ position: 'relative', '&:hover .user-dropdown-menu': { opacity: 1, visibility: 'visible', transform: 'translateY(0)' } }}>
             {isLoggedIn ? (
               <Button
-                onClick={toggleDropdown}
                 sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '50%', minWidth: 'unset', border: 'none', background: 'none', cursor: 'pointer', color: 'var(--primary-color)', '&:hover': { backgroundColor: 'var(--bg-muted)' } }}
               >
                 <PersonOutlineOutlinedIcon sx={{ width: 24, height: 24 }} />
@@ -407,21 +435,27 @@ const Header = () => {
               </Link>
             )}
 
-            {showDropdown && isLoggedIn && (
-              <Box sx={{ position: 'absolute', top: '100%', right: 0, width: '200px', background: 'var(--bg-surface)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', borderRadius: '8px', mt: '10px', zIndex: 1001, overflow: 'hidden', border: '1px solid var(--border-color)', animation: 'fadeIn 0.2s ease-out', '@keyframes fadeIn': { from: { opacity: 0, transform: 'translateY(-10px)' }, to: { opacity: 1, transform: 'translateY(0)' } } }}>
-                <Box sx={{ padding: '15px', fontSize: '14px', color: 'var(--text-main)', background: 'var(--bg-light)' }}>
-                  Xin chào, <Box component="strong">{user.name}</Box>
+            {isLoggedIn && (
+              <Box className="user-dropdown-menu" sx={{ position: 'absolute', top: '100%', right: 0, opacity: 0, visibility: 'hidden', transform: 'translateY(10px)', transition: 'all 0.2s ease-out', zIndex: 1001, pt: '10px' }}>
+                <Box sx={{ width: '200px', background: 'var(--white)', boxShadow: '0 4px 12px rgba(0,0,0,0.15)', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                  <Box sx={{ padding: '15px', fontSize: '14px', color: 'var(--text-main)', background: 'var(--bg-light)' }}>
+                    Xin chào, <Box component="strong">{user.name}</Box>
+                  </Box>
+                  <Box sx={{ height: '1px', background: 'var(--border-color)' }} />
+                  <Button sx={dropdownItemSx} onClick={() => navigate('/settings')}>Settings</Button>
+                  <Button sx={dropdownItemSx} onClick={handleLogout}>Đăng xuất</Button>
                 </Box>
-                <Box sx={{ height: '1px', background: 'var(--border-color)' }} />
-                <Button sx={dropdownItemSx} onClick={() => navigate('/settings')}>Settings</Button>
-                <Button sx={dropdownItemSx} onClick={handleLogout}>Đăng xuất</Button>
               </Box>
             )}
           </Box>
 
           <Link to="/cart" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '40px', height: '40px', borderRadius: '50%', color: 'inherit', textDecoration: 'none' }}>
             <ShoppingCartOutlinedIcon sx={{ width: 24, height: 24 }} />
-            <Box component="span" sx={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'var(--secondary-color)', color: 'var(--white)', fontSize: '10px', width: '18px', height: '18px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>2</Box>
+            {cartCount > 0 && (
+              <Box component="span" sx={{ position: 'absolute', top: 0, right: 0, backgroundColor: 'var(--secondary-color)', color: 'var(--white)', fontSize: '10px', width: '18px', height: '18px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold' }}>
+                {cartCount}
+              </Box>
+            )}
           </Link>
         </Box>
       </Box>
