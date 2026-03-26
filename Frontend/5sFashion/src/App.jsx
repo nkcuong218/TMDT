@@ -1,34 +1,34 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Home from './pages/Home/Home';
-import Login from './pages/Login/Login';
-import Register from './pages/Register/Register';
-import Account from './pages/Account/Account';
-import CategoryPage from './pages/CategoryPage/CategoryPage';
-import ProductDetail from './pages/ProductDetail/ProductDetail';
-import Cart from './pages/Cart/Cart';
-import Checkout from './pages/Checkout/Checkout';
-import AdminDashboard from './pages/Admin/Dashboard/Dashboard';
-import ProductManager from './pages/Admin/Products/ProductManager';
-import AddProduct from './pages/Admin/Products/AddProduct';
-import OrderManager from './pages/Admin/Orders/OrderManager';
-import OrderDetail from './pages/Admin/Orders/OrderDetail';
-import CustomerManager from './pages/Admin/Customers/CustomerManager';
-import CustomerDetail from './pages/Admin/Customers/CustomerDetail';
-import WarehouseManager from './pages/Admin/Warehouse/WarehouseManager';
-import WarehouseHistory from './pages/Admin/Warehouse/WarehouseHistory';
-import WarehouseInvoice from './pages/Admin/Warehouse/WarehouseInvoice';
-import WarehouseImport from './pages/Admin/Warehouse/WarehouseImport';
-import Settings from './pages/Settings/Settings';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import Home from './pages/Home/Home'
+import Login from './pages/Login/Login'
+import Register from './pages/Register/Register'
+import Account from './pages/Account/Account'
+import CategoryPage from './pages/CategoryPage/CategoryPage'
+import ProductDetail from './pages/ProductDetail/ProductDetail'
+import Cart from './pages/Cart/Cart'
+import Checkout from './pages/Checkout/Checkout'
+import AdminDashboard from './pages/Admin/Dashboard/Dashboard'
+import ProductManager from './pages/Admin/Products/ProductManager'
+import AddProduct from './pages/Admin/Products/AddProduct'
+import OrderManager from './pages/Admin/Orders/OrderManager'
+import OrderDetail from './pages/Admin/Orders/OrderDetail'
+import CustomerManager from './pages/Admin/Customers/CustomerManager'
+import CustomerDetail from './pages/Admin/Customers/CustomerDetail'
+import WarehouseManager from './pages/Admin/Warehouse/WarehouseManager'
+import WarehouseHistory from './pages/Admin/Warehouse/WarehouseHistory'
+import WarehouseInvoice from './pages/Admin/Warehouse/WarehouseInvoice'
+import WarehouseImport from './pages/Admin/Warehouse/WarehouseImport'
+import Settings from './pages/Settings/Settings'
 
 const __inlineStyles_app = `
 /* App specific styles if needed */
-`;
+`
 
 if (typeof document !== 'undefined' && !document.getElementById('app-styles')) {
-  const styleEl = document.createElement('style');
-  styleEl.id = 'app-styles';
-  styleEl.textContent = __inlineStyles_app;
-  document.head.appendChild(styleEl);
+  const styleEl = document.createElement('style')
+  styleEl.id = 'app-styles'
+  styleEl.textContent = __inlineStyles_app
+  document.head.appendChild(styleEl)
 }
 
 
@@ -61,7 +61,7 @@ function App() {
         <Route path="/admin/warehouse/import" element={<WarehouseImport />} />
       </Routes>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App

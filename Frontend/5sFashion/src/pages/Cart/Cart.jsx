@@ -73,10 +73,10 @@ const Cart = () => {
               {/* Items List */}
               <Box sx={{ flex: 2, background: 'var(--bg-surface)', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', padding: '20px' }}>
                 <Box sx={{ display: 'flex', pb: '15px', borderBottom: '1px solid var(--border-color)', fontWeight: 600, color: 'var(--text-light)', fontSize: '14px' }}>
-                  <Box sx={{ flex: 3 }}>Sáº£n Pháº©m</Box>
-                  <Box sx={{ flex: 1, textAlign: 'center' }}>ÄÆ¡n GiÃ¡</Box>
-                  <Box sx={{ flex: 1, textAlign: 'center' }}>Sá»‘ LÆ°á»£ng</Box>
-                  <Box sx={{ flex: 1, textAlign: 'right' }}>ThÃnh Tiá»n</Box>
+                  <Box sx={{ flex: 3 }}>Sản phẩm</Box>
+                  <Box sx={{ flex: 1, textAlign: 'center' }}>Đơn giá</Box>
+                  <Box sx={{ flex: 1, textAlign: 'center' }}>Số lượng</Box>
+                  <Box sx={{ flex: 1, textAlign: 'right' }}>Thành tiền</Box>
                   <Box sx={{ flex: 0.5 }}></Box>
                 </Box>
 
@@ -94,7 +94,7 @@ const Cart = () => {
                       </Box>
                     </Box>
                     <Box sx={{ flex: 1, textAlign: 'center', fontWeight: 600, color: 'var(--text-main)' }}>
-                      {item.price.toLocaleString()}Ä‘
+                      {item.price.toLocaleString()}đ
                     </Box>
                     <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <Button sx={{ width: '24px', height: '24px', minWidth: 'unset', background: 'var(--bg-muted)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '2px', color: 'var(--text-main)', p: 0 }} onClick={() => handleQuantityChange(item.id, -1)}>-</Button>
@@ -102,7 +102,7 @@ const Cart = () => {
                       <Button sx={{ width: '24px', height: '24px', minWidth: 'unset', background: 'var(--bg-muted)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '2px', color: 'var(--text-main)', p: 0 }} onClick={() => handleQuantityChange(item.id, 1)}>+</Button>
                     </Box>
                     <Box sx={{ flex: 1, textAlign: 'right', fontWeight: 700, color: 'var(--primary-color)' }}>
-                      {(item.price * item.quantity).toLocaleString()}Ä‘
+                      {(item.price * item.quantity).toLocaleString()}đ
                     </Box>
                     <Box sx={{ flex: 0.5, textAlign: 'right' }}>
                       <Button sx={{ background: 'none', border: 'none', color: 'var(--text-light)', cursor: 'pointer', minWidth: 'unset', p: '4px', '&:hover': { color: '#ff4d4f' } }} onClick={() => handleRemove(item.id)} title="Xóa">

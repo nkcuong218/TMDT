@@ -3,7 +3,7 @@ import { Box, Typography, Button } from '@mui/material'
 
 const ProductCard = ({ product }) => {
   return (
-    <Box sx={{ background: 'var(--bg-surface)', borderRadius: '8px', overflow: 'hidden', position: 'relative', transition: 'all 0.3s ease', border: '1px solid transparent', '&:hover': { boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderColor: 'var(--border-color)', transform: 'translateY(-4px)' }, '&:hover img': { transform: 'scale(1.05)' } }}>
+    <Box sx={{ width: '100%', minWidth: 0, background: 'var(--bg-surface)', borderRadius: '8px', overflow: 'hidden', position: 'relative', transition: 'all 0.3s ease', border: '1px solid transparent', '&:hover': { boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)', borderColor: 'var(--border-color)', transform: 'translateY(-4px)' }, '&:hover img': { transform: 'scale(1.05)' } }}>
       <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
         <Box sx={{ position: 'relative', width: '100%', pt: '133%', overflow: 'hidden', backgroundColor: 'var(--bg-muted)' }}>
           {product.discount > 0 && (
@@ -16,7 +16,7 @@ const ProductCard = ({ product }) => {
       <Box sx={{ p: '16px', textAlign: 'left' }}>
         <Box sx={{ fontSize: '12px', color: 'var(--text-light)', mb: '4px', textTransform: 'uppercase' }}>{product.category}</Box>
         <Link to={`/product/${product.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
-          <Typography component="h3" variant="h5" title={product.title} sx={{ fontSize: '16px', fontWeight: 500, color: 'var(--text-main)', mb: '8px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', height: '48px' }}>{product.title}</Typography>
+          <Typography component="h3" variant="h5" title={product.title} sx={{ fontSize: '16px', fontWeight: 500, color: 'var(--text-main)', mb: '8px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', overflowWrap: 'anywhere', wordBreak: 'break-word', height: '48px' }}>{product.title}</Typography>
         </Link>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: '8px', mb: '12px' }}>

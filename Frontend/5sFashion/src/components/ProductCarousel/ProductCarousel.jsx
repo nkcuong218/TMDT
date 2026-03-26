@@ -72,7 +72,13 @@ const ProductCarousel = ({ tabs = [] }) => {
             }}
           >
             {activeProducts.map(product => (
-              <Box key={product.id} sx={{ minWidth: { xs: '80vw', sm: '250px', md: '280px' }, flexShrink: 0 }}>
+              <Box
+                key={product.id}
+                sx={{
+                  flex: { xs: '0 0 80vw', sm: '0 0 250px', md: '0 0 280px' },
+                  minWidth: 0
+                }}
+              >
                 <ProductCard product={product} />
               </Box>
             ))}
